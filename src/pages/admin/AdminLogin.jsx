@@ -8,14 +8,22 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
+
     // Simulate network request
     setTimeout(() => {
-      console.log('Logging in with:', { email, password });
-      navigate('/admin/dashboard');
+      if (email === 'admin@gmail.com' && password === '1234') {
+        console.log('Login successful');
+        navigate('/admin/dashboard');
+      } else {
+        setError('Invalid email or password. Please try again.');
+        setIsLoading(false);
+      }
     }, 800);
   };
 
@@ -45,6 +53,11 @@ const AdminLogin = () => {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
+              {error && (
+                <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 animate-pulse">
+                  {error}
+                </div>
+              )}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 ml-1">
                   Email Address
