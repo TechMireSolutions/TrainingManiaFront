@@ -101,7 +101,7 @@ const Reports = () => {
             <input 
               type="text" 
               placeholder="Search candidate or training..." 
-              className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border-none text-sm focus:ring-2 focus:ring-indigo-100 w-full sm:w-64"
+              className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/50 w-full sm:w-64 text-slate-900 placeholder:text-slate-400"
             />
           </div>
         </div>
@@ -122,7 +122,7 @@ const Reports = () => {
               {reports.map((report) => (
                 <tr key={report.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-medium text-slate-900">{report.candidate}</td>
-                  <td className="px-6 py-4 text-slate-600">{report.training}</td>
+                  <td className="px-6 py-4 text-slate-500">{report.training}</td>
                   <td className="px-6 py-4 text-center">
                     <span className={`font-bold ${report.score >= 60 ? 'text-emerald-600' : 'text-red-600'}`}>
                       {report.score}/{report.totalMarks}
@@ -134,11 +134,11 @@ const Reports = () => {
                         <CheckCircle className="w-3 h-3 mr-1" />
                         {report.correct}
                       </div>
-                      <div className="flex items-center text-red-500" title="Wrong">
+                      <div className="flex items-center text-red-600" title="Wrong">
                         <XCircle className="w-3 h-3 mr-1" />
                         {report.wrong}
                       </div>
-                      <div className="flex items-center text-slate-400" title="Skipped">
+                      <div className="flex items-center text-slate-500" title="Skipped">
                         <AlertCircle className="w-3 h-3 mr-1" />
                         {report.skipped}
                       </div>
@@ -147,8 +147,8 @@ const Reports = () => {
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       report.status === 'Passed' 
-                        ? 'bg-emerald-100 text-emerald-800' 
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-emerald-50 text-emerald-600' 
+                        : 'bg-red-50 text-red-600'
                     }`}>
                       {report.status === 'Passed' ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
                       {report.status}

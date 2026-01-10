@@ -81,22 +81,22 @@ const TrainingList = () => {
         {trainings.map((training) => (
           <div key={training.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all group">
             {/* Thumbnail Area */}
-            <div className="h-48 bg-slate-100 relative overflow-hidden">
+            <div className="h-48 bg-slate-50 relative overflow-hidden">
               {training.type === 'youtube' ? (
                 training.thumbnail && !training.thumbnail.includes('null') ? (
                   <img src={training.thumbnail} alt={training.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-indigo-50">
-                    <Youtube className="w-16 h-16 text-indigo-200" />
+                    <Youtube className="w-16 h-16 text-indigo-300" />
                   </div>
                 )
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-orange-50">
-                  <FileText className="w-16 h-16 text-orange-200" />
+                  <FileText className="w-16 h-16 text-orange-300" />
                 </div>
               )}
               
-              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-700 shadow-sm">
+              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-900 shadow-sm">
                 {training.status}
               </div>
             </div>
@@ -107,7 +107,7 @@ const TrainingList = () => {
                 <div className={`p-2 rounded-lg ${training.type === 'youtube' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-orange-600'}`}>
                   {training.type === 'youtube' ? <Youtube className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                 </div>
-                <button className="text-slate-300 hover:text-slate-600 transition-colors">
+                <button className="text-slate-400 hover:text-slate-600 transition-colors">
                   <MoreVertical className="w-5 h-5" />
                 </button>
               </div>
@@ -125,14 +125,14 @@ const TrainingList = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
+              <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
                 <button className="flex-1 flex items-center justify-center py-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold hover:bg-indigo-100 transition-colors text-sm">
                   <Edit className="w-4 h-4 mr-2" />
                   Edit
                 </button>
                 <button 
                   onClick={() => handleDelete(training.id)}
-                  className="flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  className="flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

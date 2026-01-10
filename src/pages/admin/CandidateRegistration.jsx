@@ -166,7 +166,7 @@ const CandidateRegistration = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="candidate@company.com"
-                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900 placeholder:text-slate-400"
                   required
                 />
               </div>
@@ -217,7 +217,7 @@ const CandidateRegistration = () => {
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <FileText className="w-8 h-8 text-emerald-600 mr-3" />
+                  <FileText className="w-8 h-8 text-emerald-500 mr-3" />
                   <div>
                     <p className="font-semibold text-slate-900">{csvFile.name}</p>
                     <p className="text-xs text-slate-500">{(csvFile.size / 1024).toFixed(2)} KB</p>
@@ -229,7 +229,7 @@ const CandidateRegistration = () => {
               </div>
               <button 
                 onClick={handleBulkUpload}
-                className="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold hover:bg-emerald-700 transition-colors"
+                className="w-full bg-emerald-600 text-white py-2 rounded-lg font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
               >
                 Process Import
               </button>

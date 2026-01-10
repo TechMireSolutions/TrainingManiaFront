@@ -66,7 +66,7 @@ const GeneratedTest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-8">
+    <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <button
@@ -110,7 +110,7 @@ const GeneratedTest = () => {
 
           <div className="space-y-8">
             {questions.map((q, index) => (
-              <div key={index} className="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-200 transition-colors">
+              <div key={index} className="p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-500 transition-colors">
                 <div className="flex items-start gap-4">
                   <div className="w-8 h-8 bg-white rounded-lg border border-slate-200 flex items-center justify-center font-bold text-slate-500 flex-shrink-0 shadow-sm">
                     {index + 1}
@@ -118,7 +118,7 @@ const GeneratedTest = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <span className={`text-xs font-bold px-2 py-1 rounded uppercase tracking-wide ${
-                        q.type === 'mcq' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                        q.type === 'mcq' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
                       }`}>
                         {q.type === 'mcq' ? 'Multiple Choice' : 'Fill in Blank'}
                       </span>
@@ -128,7 +128,7 @@ const GeneratedTest = () => {
                     {q.type === 'mcq' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {q.options.map((opt, i) => (
-                          <div key={i} className="flex items-center p-3 bg-white rounded-lg border border-slate-200 text-slate-600">
+                          <div key={i} className="flex items-center p-3 bg-white rounded-lg border border-slate-200 text-slate-700">
                             <div className="w-5 h-5 rounded-full border-2 border-slate-300 mr-3"></div>
                             {opt}
                           </div>
@@ -154,7 +154,7 @@ const GeneratedTest = () => {
             disabled={isSaved}
             className={`flex items-center px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all transform hover:-translate-y-1 ${
               isSaved 
-                ? 'bg-green-600 text-white cursor-default' 
+                ? 'bg-emerald-600 text-white cursor-default' 
                 : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
             }`}
           >

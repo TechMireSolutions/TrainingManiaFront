@@ -79,10 +79,10 @@ const Enrollment = () => {
                 <select
                   value={selectedCandidate}
                   onChange={(e) => setSelectedCandidate(e.target.value)}
-                  className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none appearance-none transition-all"
+                  className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none appearance-none transition-all text-slate-900"
                   required
                 >
-                  <option value="">Choose a candidate...</option>
+                  <option value="" className="text-slate-500">Choose a candidate...</option>
                   {candidates.map((email, index) => (
                     <option key={index} value={email}>{email}</option>
                   ))}
@@ -90,7 +90,7 @@ const Enrollment = () => {
                 <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
               </div>
               {candidates.length === 0 && (
-                <p className="text-xs text-amber-500 mt-2">No candidates found. Please add candidates first.</p>
+                <p className="text-xs text-amber-600 mt-2">No candidates found. Please add candidates first.</p>
               )}
             </div>
 
@@ -100,10 +100,10 @@ const Enrollment = () => {
                 <select
                   value={selectedTraining}
                   onChange={(e) => setSelectedTraining(e.target.value)}
-                  className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none appearance-none transition-all"
+                  className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none appearance-none transition-all text-slate-900"
                   required
                 >
-                  <option value="">Choose a training...</option>
+                  <option value="" className="text-slate-500">Choose a training...</option>
                   {trainings.map((training) => (
                     <option key={training.id} value={training.id}>{training.title}</option>
                   ))}
@@ -131,7 +131,7 @@ const Enrollment = () => {
               <input 
                 type="text" 
                 placeholder="Search..." 
-                className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border-none text-sm focus:ring-2 focus:ring-indigo-100 w-full sm:w-48"
+                className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/50 w-full sm:w-48 text-slate-900 placeholder:text-slate-400"
               />
             </div>
           </div>
@@ -151,15 +151,15 @@ const Enrollment = () => {
                   enrollments.map((enrollment) => (
                     <tr key={enrollment.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-slate-900">{enrollment.candidate}</td>
-                      <td className="px-6 py-4 text-slate-600">
+                      <td className="px-6 py-4 text-slate-500">
                         <div className="flex items-center">
-                          <BookOpen className="w-4 h-4 mr-2 text-indigo-500" />
+                          <BookOpen className="w-4 h-4 mr-2 text-indigo-600" />
                           {enrollment.training}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-slate-500 text-sm">{enrollment.date}</td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">
                           <CheckCircle className="w-3 h-3 mr-1" />
                           {enrollment.status}
                         </span>

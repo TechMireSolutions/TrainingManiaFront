@@ -47,7 +47,7 @@ const NewTraining = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Introduction to React"
-            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-lg font-medium"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-lg font-medium text-slate-900 placeholder:text-slate-400"
           />
         </div>
 
@@ -93,7 +93,7 @@ const NewTraining = () => {
                 <input
                   type="url"
                   placeholder="https://youtube.com/watch?v=..."
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900 placeholder:text-slate-400"
                 />
               </div>
             ) : (
@@ -119,8 +119,8 @@ const NewTraining = () => {
                     />
                     <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors">
                       <FileText className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-                      <p className="text-slate-600 font-medium">Click to upload or drag and drop</p>
-                      <p className="text-sm text-slate-400">PDF up to 10MB</p>
+                      <p className="text-slate-900 font-medium">Click to upload or drag and drop</p>
+                      <p className="text-sm text-slate-500">PDF up to 10MB</p>
                     </div>
                   </div>
                 ) : (
@@ -136,7 +136,7 @@ const NewTraining = () => {
                     </div>
                     <button 
                       onClick={() => setSelectedFile(null)}
-                      className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
+                      className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -155,13 +155,13 @@ const NewTraining = () => {
           </h3>
 
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 gap-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   checked={testTypes.mcq}
                   onChange={() => handleTestTypeChange('mcq')}
-                  className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+                  className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-slate-300"
                 />
                 <div className="ml-3">
                   <span className="block text-sm font-bold text-slate-900">Multiple Choice Questions</span>
@@ -174,20 +174,20 @@ const NewTraining = () => {
                     type="number"
                     value={percentages.mcq}
                     onChange={(e) => setPercentages(prev => ({ ...prev, mcq: parseInt(e.target.value) || 0 }))}
-                    className="w-16 text-right outline-none font-bold text-indigo-600"
+                    className="w-16 text-right outline-none font-bold text-indigo-600 bg-transparent"
                   />
-                  <span className="ml-1 text-slate-400 font-medium">%</span>
+                  <span className="ml-1 text-slate-500 font-medium">%</span>
                 </div>
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 gap-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   checked={testTypes.fillInBlanks}
                   onChange={() => handleTestTypeChange('fillInBlanks')}
-                  className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+                  className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-slate-300"
                 />
                 <div className="ml-3">
                   <span className="block text-sm font-bold text-slate-900">Fill in the Blanks</span>
@@ -200,15 +200,15 @@ const NewTraining = () => {
                     type="number"
                     value={percentages.fillInBlanks}
                     onChange={(e) => setPercentages(prev => ({ ...prev, fillInBlanks: parseInt(e.target.value) || 0 }))}
-                    className="w-16 text-right outline-none font-bold text-indigo-600"
+                    className="w-16 text-right outline-none font-bold text-indigo-600 bg-transparent"
                   />
-                  <span className="ml-1 text-slate-400 font-medium">%</span>
+                  <span className="ml-1 text-slate-500 font-medium">%</span>
                 </div>
               )}
             </div>
             
             {(percentages.mcq + percentages.fillInBlanks !== 100) && (
-              <div className="flex items-center text-amber-600 text-sm bg-amber-50 p-3 rounded-lg">
+              <div className="flex items-center text-amber-700 text-sm bg-amber-50 p-3 rounded-lg border border-amber-200">
                 <AlertCircle className="w-4 h-4 mr-2" />
                 Total percentage must equal 100% (Current: {percentages.mcq + percentages.fillInBlanks}%)
               </div>
@@ -228,7 +228,7 @@ const NewTraining = () => {
               <label className="block text-sm font-semibold text-slate-700 mb-2">Total Marks</label>
               <input
                 type="number"
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
                 placeholder="e.g. 100"
               />
             </div>
@@ -236,7 +236,7 @@ const NewTraining = () => {
               <label className="block text-sm font-semibold text-slate-700 mb-2">Passing Marks</label>
               <input
                 type="number"
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
                 placeholder="e.g. 60"
               />
             </div>
@@ -246,14 +246,14 @@ const NewTraining = () => {
                 type="number"
                 value={attempts}
                 onChange={(e) => setAttempts(parseInt(e.target.value))}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
             <div className="flex items-center">
-              <div className={`w-10 h-6 rounded-full p-1 transition-colors cursor-pointer ${negativeMarking ? 'bg-indigo-600' : 'bg-slate-300'}`} onClick={() => setNegativeMarking(!negativeMarking)}>
+              <div className={`w-10 h-6 rounded-full p-1 transition-colors cursor-pointer ${negativeMarking ? 'bg-indigo-600' : 'bg-slate-200'}`} onClick={() => setNegativeMarking(!negativeMarking)}>
                 <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${negativeMarking ? 'translate-x-4' : ''}`}></div>
               </div>
               <span className="ml-3 text-sm font-bold text-slate-900">Enable Negative Marking</span>
@@ -266,7 +266,7 @@ const NewTraining = () => {
                   <input
                     type="number"
                     step="0.25"
-                    className="w-full outline-none font-bold text-red-500"
+                    className="w-full outline-none font-bold text-red-500 bg-transparent"
                     placeholder="0.25"
                   />
                 </div>

@@ -47,7 +47,7 @@ const AdminDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex font-sans relative">
+    <div className="h-screen bg-slate-50 flex font-sans overflow-hidden text-slate-900">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -58,10 +58,10 @@ const AdminDashboard = () => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed md:static inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-100 flex flex-col transition-transform duration-300 ease-in-out
+        fixed md:static inset-y-0 left-0 z-40 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-300 ease-in-out flex-shrink-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        <div className="p-8 flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
               <span className="text-white font-bold text-xl">T</span>
@@ -88,7 +88,7 @@ const AdminDashboard = () => {
           <NavItem id="reports" icon={BarChart2} label="Reports" />
         </nav>
 
-        <div className="p-6 border-t border-slate-100">
+        <div className="p-6 border-t border-slate-100 flex-shrink-0">
           <button
             onClick={handleLogout}
             className="flex items-center w-full px-4 py-3 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
@@ -100,9 +100,9 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen w-full">
+      <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
         {/* Top Header */}
-        <header className="bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-slate-100 px-4 md:px-8 py-4 flex items-center justify-between">
+        <header className="bg-white/80 backdrop-blur-md z-20 border-b border-slate-200 px-4 md:px-8 py-4 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
@@ -110,12 +110,12 @@ const AdminDashboard = () => {
             >
               <Menu className="w-6 h-6" />
             </button>
-            <div className="flex items-center bg-slate-100/50 rounded-xl px-4 py-2.5 w-full md:w-96 border border-transparent focus-within:border-indigo-200 focus-within:bg-white transition-all">
+            <div className="flex items-center bg-slate-100 rounded-xl px-4 py-2.5 w-full md:w-96 border border-transparent focus-within:border-indigo-500 focus-within:bg-white transition-all">
               <Search className="w-5 h-5 text-slate-400 mr-3 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Search anything..."
-                className="bg-transparent border-none focus:outline-none w-full text-slate-700 placeholder:text-slate-400 font-medium"
+                className="bg-transparent border-none focus:outline-none w-full text-slate-900 placeholder:text-slate-400 font-medium"
               />
             </div>
           </div>
@@ -125,12 +125,12 @@ const AdminDashboard = () => {
               <Bell className="w-6 h-6" />
               <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <div className="flex items-center gap-3 pl-6 border-l border-slate-100">
+            <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-slate-900">Admin User</p>
                 <p className="text-xs text-slate-500">Super Admin</p>
               </div>
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold border-2 border-white shadow-sm">
+              <div className="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-bold border-2 border-white shadow-sm">
                 AD
               </div>
             </div>
