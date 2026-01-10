@@ -8,8 +8,10 @@ import {
   Save,
   Plus
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const NewTraining = () => {
+  const navigate = useNavigate();
   const [contentType, setContentType] = useState('youtube');
   const [testTypes, setTestTypes] = useState({
     mcq: true,
@@ -222,7 +224,23 @@ const NewTraining = () => {
 
         <div className="flex justify-end pt-4">
           <button
-            type="submit"
+            type="button"
+            onClick={() => {
+              // Validate percentages
+              if (testTypes.mcq && testTypes.fillInBlanks && (percentages.mcq + percentages.fillInBlanks !== 100)) {
+                alert('Total percentage must equal 100%');
+                return;
+              }
+              
+              // Prepare config
+              const config = {
+                mcq: testTypes.mcq ? percentages.mcq : 0,
+                fib: testTypes.fillInBlanks ? percentages.fillInBlanks : 0
+              };
+
+              // Navigate to preview
+              navigate('/admin/test-preview', { state: { config } });
+            }}
             className="flex items-center bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95"
           >
             <Save className="w-5 h-5 mr-2" />
