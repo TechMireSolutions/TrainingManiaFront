@@ -58,7 +58,7 @@ const NewTraining = () => {
             Course Content
           </h3>
           
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <button
               type="button"
               onClick={() => setContentType('youtube')}
@@ -125,18 +125,18 @@ const NewTraining = () => {
                   </div>
                 ) : (
                   <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-indigo-600 shadow-sm mr-4">
+                    <div className="flex items-center overflow-hidden">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-indigo-600 shadow-sm mr-4 flex-shrink-0">
                         <FileText className="w-6 h-6" />
                       </div>
-                      <div>
-                        <p className="font-semibold text-slate-900">{selectedFile.name}</p>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-slate-900 truncate">{selectedFile.name}</p>
                         <p className="text-xs text-slate-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB • Uploaded successfully</p>
                       </div>
                     </div>
                     <button 
                       onClick={() => setSelectedFile(null)}
-                      className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-red-500 transition-colors"
+                      className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -148,14 +148,14 @@ const NewTraining = () => {
         </div>
 
         {/* 2. Assessment Configuration */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
           <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
             <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3">2</div>
             Assessment Structure
           </h3>
 
           <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 gap-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -169,7 +169,7 @@ const NewTraining = () => {
                 </div>
               </div>
               {testTypes.mcq && (
-                <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-slate-200">
+                <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-slate-200 self-start sm:self-auto">
                   <input
                     type="number"
                     value={percentages.mcq}
@@ -181,7 +181,7 @@ const NewTraining = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 gap-4">
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -195,7 +195,7 @@ const NewTraining = () => {
                 </div>
               </div>
               {testTypes.fillInBlanks && (
-                <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-slate-200">
+                <div className="flex items-center bg-white px-3 py-2 rounded-lg border border-slate-200 self-start sm:self-auto">
                   <input
                     type="number"
                     value={percentages.fillInBlanks}
@@ -217,13 +217,13 @@ const NewTraining = () => {
         </div>
 
         {/* 3. Rules & Scoring */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
           <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
             <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3">3</div>
             Rules & Scoring
           </h3>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Total Marks</label>
               <input

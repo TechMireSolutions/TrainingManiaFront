@@ -145,7 +145,7 @@ const CandidateRegistration = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Manual Registration */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center mb-6">
             <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 mr-4">
               <UserPlus className="w-6 h-6" />
@@ -181,7 +181,7 @@ const CandidateRegistration = () => {
         </div>
 
         {/* Bulk Upload */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex items-center mb-6">
             <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 mr-4">
               <UploadCloud className="w-6 h-6" />
@@ -240,26 +240,29 @@ const CandidateRegistration = () => {
 
       {/* Recent Activity */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-6 border-b border-slate-100">
+        <div className="p-6 md:p-8 border-b border-slate-100 flex items-center justify-between">
           <h3 className="text-lg font-bold text-slate-900">Recent Registrations</h3>
+          <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-sm font-semibold">
+            {recentCandidates.length} Candidates
+          </span>
         </div>
         <div className="divide-y divide-slate-100">
           {recentCandidates.map((candidate, index) => {
             if (!candidate || !candidate.email) return null;
             return (
-              <div key={index} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold mr-4">
+              <div key={index} className="p-4 md:p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div className="flex items-center overflow-hidden mr-4">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold mr-4 flex-shrink-0">
                     {(candidate.email || '?').charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <p className="font-medium text-slate-900">{candidate.email}</p>
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-900 truncate">{candidate.email}</p>
                     <p className="text-xs text-slate-500">{candidate.method}</p>
                   </div>
                 </div>
-                <div className="flex items-center text-sm text-slate-500">
+                <div className="flex items-center text-sm text-slate-500 flex-shrink-0">
                   <CheckCircle className="w-4 h-4 text-emerald-500 mr-2" />
-                  {candidate.date}
+                  <span className="hidden sm:inline">{candidate.date}</span>
                 </div>
               </div>
             );
