@@ -12,11 +12,12 @@ const CandidateRegistration = () => {
   const [email, setEmail] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [csvFile, setCsvFile] = useState(null);
-  const [recentCandidates, setRecentCandidates] = useState([
-    { email: "alex.johnson@example.com", date: "Just now", method: "Manual" },
-    { email: "sarah.williams@example.com", date: "2 mins ago", method: "Manual" },
-    { email: "bulk_import_jan10.csv", date: "1 hour ago", method: "Bulk Upload (45 users)" }
-  ]);
+  const [recentCandidates, setRecentCandidates] = useState([]);
+
+  // Helper to generate random 6-char code
+  const generateAccessCode = () => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
 
   useEffect(() => {
     try {
@@ -25,16 +26,21 @@ const CandidateRegistration = () => {
         // Check if stored data is array of strings (old format) or objects (new format)
         const formatted = stored.map(item => {
           if (typeof item === 'string') {
-            return { email: item, date: 'Previously added', method: 'Unknown' };
+            return { 
+              email: item, 
+              date: 'Previously added', 
+              method: 'Unknown',
+              code: 'N/A', // Legacy data won't have code
+              password: null
+            };
           }
           return item;
-        }).filter(item => item && item.email); // Filter out invalid items
+        }).filter(item => item && item.email); 
         
         setRecentCandidates(formatted);
       }
     } catch (error) {
       console.error("Failed to load candidates:", error);
-      // Fallback to default or empty if error
     }
   }, []);
 
@@ -46,7 +52,13 @@ const CandidateRegistration = () => {
       if (Array.isArray(existing)) {
         existingFormatted = existing.map(item => {
           if (typeof item === 'string') {
-            return { email: item, date: 'Previously added', method: 'Unknown' };
+            return { 
+              email: item, 
+              date: 'Previously added', 
+              method: 'Unknown',
+              code: 'N/A',
+              password: null
+            };
           }
           return item;
         }).filter(item => item && item.email);
@@ -67,11 +79,17 @@ const CandidateRegistration = () => {
   const handleManualAdd = (e) => {
     e.preventDefault();
     if (email) {
-      const newCandidate = { email, date: "Just now", method: "Manual" };
+      const newCandidate = { 
+        email, 
+        date: "Just now", 
+        method: "Manual",
+        code: generateAccessCode(),
+        password: null 
+      };
       setRecentCandidates([newCandidate, ...recentCandidates]);
       saveToLocalStorage([newCandidate]);
       setEmail('');
-      alert(`Candidate ${email} added successfully!`);
+      alert(`Candidate ${email} added! Access Code: ${newCandidate.code}`);
     }
   };
 
@@ -124,7 +142,9 @@ const CandidateRegistration = () => {
         const newCandidates = emails.map(email => ({
           email,
           date: "Just now",
-          method: "Bulk Upload"
+          method: "Bulk Upload",
+          code: generateAccessCode(),
+          password: null
         }));
 
         setRecentCandidates(prev => [...newCandidates, ...prev]);
@@ -246,32 +266,48 @@ const CandidateRegistration = () => {
             {recentCandidates.length} Candidates
           </span>
         </div>
-        <div className="divide-y divide-slate-100">
-          {recentCandidates.map((candidate, index) => {
-            if (!candidate || !candidate.email) return null;
-            return (
-              <div key={index} className="p-4 md:p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                <div className="flex items-center overflow-hidden mr-4">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold mr-4 flex-shrink-0">
-                    {(candidate.email || '?').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-slate-900 truncate">{candidate.email}</p>
-                    <p className="text-xs text-slate-500">{candidate.method}</p>
-                  </div>
-                </div>
-                <div className="flex items-center text-sm text-slate-500 flex-shrink-0">
-                  <CheckCircle className="w-4 h-4 text-emerald-500 mr-2" />
-                  <span className="hidden sm:inline">{candidate.date}</span>
-                </div>
-              </div>
-            );
-          })}
-          {recentCandidates.length === 0 && (
-            <div className="p-8 text-center text-slate-400">
-              No candidates registered yet.
-            </div>
-          )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+              <tr>
+                <th className="px-6 py-4">Email Address</th>
+                <th className="px-6 py-4">Access Code</th>
+                <th className="px-6 py-4">Date Added</th>
+                <th className="px-6 py-4">Method</th>
+                <th className="px-6 py-4">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {recentCandidates.map((candidate, index) => {
+                if (!candidate || !candidate.email) return null;
+                return (
+                  <tr key={index} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-slate-900">{candidate.email}</td>
+                    <td className="px-6 py-4">
+                      <span className="font-mono text-indigo-600 bg-indigo-50 px-2 py-1 rounded text-xs font-bold border border-indigo-100">
+                        {candidate.code || 'N/A'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-500 text-sm">{candidate.date}</td>
+                    <td className="px-6 py-4 text-slate-500 text-sm">{candidate.method}</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Active
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {recentCandidates.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="p-8 text-center text-slate-400">
+                    No candidates registered yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

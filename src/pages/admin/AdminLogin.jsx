@@ -28,7 +28,6 @@ const AdminLogin = () => {
   };
 
   return (
-  return (
     <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-6 relative">
       <div className="absolute top-0 left-0 w-full h-64 bg-indigo-600/5 -skew-y-3 origin-top-left -z-10"></div>
       

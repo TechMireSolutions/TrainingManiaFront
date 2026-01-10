@@ -118,7 +118,7 @@ const LandingPage = () => {
             variants={itemVariants}
             whileHover={{ scale: 1.02, y: -5 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => console.log('Candidate login not implemented yet')}
+            onClick={() => navigate('/candidate/login')}
             className="group relative bg-white p-10 rounded-[2.5rem] border border-slate-100 hover:border-blue-200 transition-all duration-500 text-left overflow-hidden shadow-xl shadow-blue-100/50 hover:shadow-2xl hover:shadow-blue-200/50"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
