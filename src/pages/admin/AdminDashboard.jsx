@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { 
-  LayoutDashboard, 
   Users, 
   BookOpen, 
-  Settings, 
   LogOut, 
   Bell, 
   Search, 
-  MoreVertical,
-  TrendingUp,
-  Clock,
   CheckCircle,
   Plus,
-  UserCheck
+  UserCheck,
+  BarChart2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,10 +16,11 @@ import NewTraining from './NewTraining';
 import TrainingList from './TrainingList';
 import CandidateRegistration from './CandidateRegistration';
 import Enrollment from './Enrollment';
+import Reports from './Reports';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('new-training');
 
   const handleLogout = () => {
     navigate('/');
@@ -61,12 +58,11 @@ const AdminDashboard = () => {
 
         <nav className="flex-1 px-6 space-y-2 mt-2">
           <div className="px-4 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu</div>
-          <NavItem id="dashboard" icon={LayoutDashboard} label="Overview" />
           <NavItem id="new-training" icon={Plus} label="New Training" />
           <NavItem id="modules" icon={BookOpen} label="Training Modules" />
           <NavItem id="candidates" icon={Users} label="Candidates" />
           <NavItem id="register" icon={UserCheck} label="Register" />
-          <NavItem id="settings" icon={Settings} label="Settings" />
+          <NavItem id="reports" icon={BarChart2} label="Reports" />
         </nav>
 
         <div className="p-6 border-t border-slate-100">
@@ -120,6 +116,8 @@ const AdminDashboard = () => {
             <CandidateRegistration />
           ) : activeTab === 'register' ? (
             <Enrollment />
+          ) : activeTab === 'reports' ? (
+            <Reports />
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-slate-400">
               <LayoutDashboard className="w-16 h-16 mb-4 opacity-20" />

@@ -1,0 +1,177 @@
+import React, { useState } from 'react';
+import { 
+  BarChart2, 
+  Search, 
+  Download, 
+  Filter,
+  CheckCircle,
+  XCircle,
+  AlertCircle
+} from 'lucide-react';
+
+const Reports = () => {
+  // Mock Data for Reports
+  const [reports] = useState([
+    {
+      id: 1,
+      candidate: "alex.johnson@example.com",
+      training: "WordPress Fundamentals",
+      score: 85,
+      totalMarks: 100,
+      correct: 17,
+      wrong: 3,
+      skipped: 0,
+      status: "Passed",
+      date: "Jan 10, 2026"
+    },
+    {
+      id: 2,
+      candidate: "sarah.williams@example.com",
+      training: "Cyber Security Basics",
+      score: 45,
+      totalMarks: 100,
+      correct: 9,
+      wrong: 11,
+      skipped: 0,
+      status: "Failed",
+      date: "Jan 09, 2026"
+    },
+    {
+      id: 3,
+      candidate: "michael.brown@company.net",
+      training: "Advanced React Patterns",
+      score: 92,
+      totalMarks: 100,
+      correct: 18,
+      wrong: 1,
+      skipped: 1,
+      status: "Passed",
+      date: "Jan 08, 2026"
+    },
+    {
+      id: 4,
+      candidate: "emily.davis@provider.org",
+      training: "WordPress Fundamentals",
+      score: 70,
+      totalMarks: 100,
+      correct: 14,
+      wrong: 6,
+      skipped: 0,
+      status: "Passed",
+      date: "Jan 08, 2026"
+    },
+    {
+      id: 5,
+      candidate: "david.wilson@studio.io",
+      training: "Cyber Security Basics",
+      score: 30,
+      totalMarks: 100,
+      correct: 6,
+      wrong: 14,
+      skipped: 0,
+      status: "Failed",
+      date: "Jan 07, 2026"
+    }
+  ]);
+
+  return (
+    <div className="w-full">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Performance Reports</h2>
+          <p className="text-slate-500">View detailed test results and candidate performance.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="flex items-center px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors font-medium">
+            <Filter className="w-4 h-4 mr-2" />
+            Filter
+          </button>
+          <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-lg shadow-indigo-200">
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-slate-900">All Test Results</h3>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input 
+              type="text" 
+              placeholder="Search candidate or training..." 
+              className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border-none text-sm focus:ring-2 focus:ring-indigo-100 w-64"
+            />
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
+              <tr>
+                <th className="px-6 py-4">Candidate</th>
+                <th className="px-6 py-4">Training Module</th>
+                <th className="px-6 py-4 text-center">Score</th>
+                <th className="px-6 py-4 text-center">Performance</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Date</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {reports.map((report) => (
+                <tr key={report.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-6 py-4 font-medium text-slate-900">{report.candidate}</td>
+                  <td className="px-6 py-4 text-slate-600">{report.training}</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className={`font-bold ${report.score >= 60 ? 'text-emerald-600' : 'text-red-600'}`}>
+                      {report.score}/{report.totalMarks}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-center gap-4 text-xs">
+                      <div className="flex items-center text-emerald-600" title="Correct">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        {report.correct}
+                      </div>
+                      <div className="flex items-center text-red-500" title="Wrong">
+                        <XCircle className="w-3 h-3 mr-1" />
+                        {report.wrong}
+                      </div>
+                      <div className="flex items-center text-slate-400" title="Skipped">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        {report.skipped}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      report.status === 'Passed' 
+                        ? 'bg-emerald-100 text-emerald-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {report.status === 'Passed' ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                      {report.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-slate-500 text-sm">{report.date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination Placeholder */}
+        <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
+          <span>Showing 1 to 5 of 5 results</span>
+          <div className="flex gap-2">
+            <button className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Previous</button>
+            <button className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Reports;

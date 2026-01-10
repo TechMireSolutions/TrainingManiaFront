@@ -17,7 +17,11 @@ const Enrollment = () => {
   useEffect(() => {
     // Load Candidates
     const storedCandidates = JSON.parse(localStorage.getItem('candidates_list') || '[]');
-    setCandidates(storedCandidates);
+    // Handle both string arrays (legacy) and object arrays (new)
+    const candidateEmails = storedCandidates.map(item => 
+      typeof item === 'string' ? item : item.email
+    );
+    setCandidates(candidateEmails);
 
     // Load Trainings (Mock + LocalStorage)
     const savedTrainings = JSON.parse(localStorage.getItem('training_modules') || '[]');

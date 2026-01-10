@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   UserPlus, 
   UploadCloud, 
@@ -18,12 +18,50 @@ const CandidateRegistration = () => {
     { email: "bulk_import_jan10.csv", date: "1 hour ago", method: "Bulk Upload (45 users)" }
   ]);
 
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('candidates_list') || '[]');
+      if (Array.isArray(stored) && stored.length > 0) {
+        // Check if stored data is array of strings (old format) or objects (new format)
+        const formatted = stored.map(item => {
+          if (typeof item === 'string') {
+            return { email: item, date: 'Previously added', method: 'Unknown' };
+          }
+          return item;
+        }).filter(item => item && item.email); // Filter out invalid items
+        
+        setRecentCandidates(formatted);
+      }
+    } catch (error) {
+      console.error("Failed to load candidates:", error);
+      // Fallback to default or empty if error
+    }
+  }, []);
+
   const saveToLocalStorage = (newCandidates) => {
-    const existing = JSON.parse(localStorage.getItem('candidates_list') || '[]');
-    // Avoid duplicates
-    const unique = [...existing, ...newCandidates.map(c => c.email)];
-    const uniqueSet = [...new Set(unique)];
-    localStorage.setItem('candidates_list', JSON.stringify(uniqueSet));
+    try {
+      const existing = JSON.parse(localStorage.getItem('candidates_list') || '[]');
+      let existingFormatted = [];
+
+      if (Array.isArray(existing)) {
+        existingFormatted = existing.map(item => {
+          if (typeof item === 'string') {
+            return { email: item, date: 'Previously added', method: 'Unknown' };
+          }
+          return item;
+        }).filter(item => item && item.email);
+      }
+      
+      // Filter out duplicates based on email
+      const existingEmails = new Set(existingFormatted.map(c => c.email));
+      const uniqueNew = newCandidates.filter(c => !existingEmails.has(c.email));
+      
+      const updatedList = [...uniqueNew, ...existingFormatted];
+      localStorage.setItem('candidates_list', JSON.stringify(updatedList));
+    } catch (error) {
+      console.error("Failed to save candidates:", error);
+      alert("Failed to save candidate data. Please try clearing your browser cache if this persists.");
+    }
   };
 
   const handleManualAdd = (e) => {
@@ -206,23 +244,31 @@ const CandidateRegistration = () => {
           <h3 className="text-lg font-bold text-slate-900">Recent Registrations</h3>
         </div>
         <div className="divide-y divide-slate-100">
-          {recentCandidates.map((candidate, index) => (
-            <div key={index} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold mr-4">
-                  {candidate.email.charAt(0).toUpperCase()}
+          {recentCandidates.map((candidate, index) => {
+            if (!candidate || !candidate.email) return null;
+            return (
+              <div key={index} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold mr-4">
+                    {(candidate.email || '?').charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900">{candidate.email}</p>
+                    <p className="text-xs text-slate-500">{candidate.method}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-slate-900">{candidate.email}</p>
-                  <p className="text-xs text-slate-500">{candidate.method}</p>
+                <div className="flex items-center text-sm text-slate-500">
+                  <CheckCircle className="w-4 h-4 text-emerald-500 mr-2" />
+                  {candidate.date}
                 </div>
               </div>
-              <div className="flex items-center text-sm text-slate-500">
-                <CheckCircle className="w-4 h-4 text-emerald-500 mr-2" />
-                {candidate.date}
-              </div>
+            );
+          })}
+          {recentCandidates.length === 0 && (
+            <div className="p-8 text-center text-slate-400">
+              No candidates registered yet.
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
