@@ -32,7 +32,7 @@ const NewTraining = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-full">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-slate-900">Create New Training</h2>
         <p className="text-slate-500">Configure the course content and assessment rules.</p>

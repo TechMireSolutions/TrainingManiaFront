@@ -18,10 +18,20 @@ const CandidateRegistration = () => {
     { email: "bulk_import_jan10.csv", date: "1 hour ago", method: "Bulk Upload (45 users)" }
   ]);
 
+  const saveToLocalStorage = (newCandidates) => {
+    const existing = JSON.parse(localStorage.getItem('candidates_list') || '[]');
+    // Avoid duplicates
+    const unique = [...existing, ...newCandidates.map(c => c.email)];
+    const uniqueSet = [...new Set(unique)];
+    localStorage.setItem('candidates_list', JSON.stringify(uniqueSet));
+  };
+
   const handleManualAdd = (e) => {
     e.preventDefault();
     if (email) {
-      setRecentCandidates([{ email, date: "Just now", method: "Manual" }, ...recentCandidates]);
+      const newCandidate = { email, date: "Just now", method: "Manual" };
+      setRecentCandidates([newCandidate, ...recentCandidates]);
+      saveToLocalStorage([newCandidate]);
       setEmail('');
       alert(`Candidate ${email} added successfully!`);
     }
@@ -80,6 +90,7 @@ const CandidateRegistration = () => {
         }));
 
         setRecentCandidates(prev => [...newCandidates, ...prev]);
+        saveToLocalStorage(newCandidates);
         setCsvFile(null);
         alert(`Successfully processed ${emails.length} candidates from CSV!`);
       };
@@ -88,7 +99,7 @@ const CandidateRegistration = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="w-full">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-slate-900">Candidate Registration</h2>
         <p className="text-slate-500">Add new candidates to the system manually or via bulk upload.</p>
