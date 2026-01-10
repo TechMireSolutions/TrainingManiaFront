@@ -6,10 +6,11 @@ import { mcqPool, fibPool } from '../../data/questionBank';
 const GeneratedTest = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { config, title, contentType } = location.state || { 
+  const { config, title, contentType, videoUrl } = location.state || { 
     config: { mcq: 70, fib: 30 },
     title: 'Untitled Training',
-    contentType: 'youtube'
+    contentType: 'youtube',
+    videoUrl: ''
   };
 
   const [questions, setQuestions] = useState([]);
@@ -42,12 +43,23 @@ const GeneratedTest = () => {
   }, []);
 
   const handleSave = () => {
+    // Helper to extract YouTube ID
+    const getYoutubeId = (url) => {
+      if (!url) return '8Jv47_VIBOQ'; // Default ID
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : '8Jv47_VIBOQ';
+    };
+
+    const videoId = getYoutubeId(videoUrl);
+
     // Create new training object
     const newTraining = {
       id: Date.now(),
       title: title,
       type: contentType,
-      thumbnail: contentType === 'youtube' ? "https://img.youtube.com/vi/8Jv47_VIBOQ/maxresdefault.jpg" : null,
+      videoUrl: videoUrl,
+      thumbnail: contentType === 'youtube' ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
       duration: contentType === 'youtube' ? "20 mins" : "12 pages",
       candidates: 0,
       status: "Active",

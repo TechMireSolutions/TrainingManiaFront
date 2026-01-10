@@ -27,6 +27,8 @@ const NewTraining = () => {
   const [attempts, setAttempts] = useState(3);
   const [negativeMarking, setNegativeMarking] = useState(false);
 
+  const [videoUrl, setVideoUrl] = useState('');
+
   const handleTestTypeChange = (type) => {
     setTestTypes(prev => ({ ...prev, [type]: !prev[type] }));
   };
@@ -92,6 +94,8 @@ const NewTraining = () => {
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Video URL</label>
                 <input
                   type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="https://youtube.com/watch?v=..."
                   className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900 placeholder:text-slate-400"
                 />
@@ -300,7 +304,8 @@ const NewTraining = () => {
                 state: { 
                   config,
                   title,
-                  contentType
+                  contentType,
+                  videoUrl
                 } 
               });
             }}
