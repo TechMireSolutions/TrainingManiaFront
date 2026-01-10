@@ -6,12 +6,15 @@ import {
   Type, 
   AlertCircle, 
   Save,
-  Plus
+  Plus,
+  X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NewTraining = () => {
   const navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [contentType, setContentType] = useState('youtube');
   const [testTypes, setTestTypes] = useState({
     mcq: true,
@@ -36,6 +39,18 @@ const NewTraining = () => {
       </div>
 
       <form className="space-y-8">
+        {/* Title Section */}
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+          <label className="block text-sm font-semibold text-slate-700 mb-2">Training Module Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Introduction to React"
+            className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-lg font-medium"
+          />
+        </div>
+
         {/* 1. Course Content Section */}
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
           <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
@@ -84,11 +99,49 @@ const NewTraining = () => {
             ) : (
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Upload PDF</label>
-                <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer">
-                  <FileText className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-                  <p className="text-slate-600 font-medium">Click to upload or drag and drop</p>
-                  <p className="text-sm text-slate-400">PDF up to 10MB</p>
-                </div>
+                {!selectedFile ? (
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          if (file.size > 10 * 1024 * 1024) {
+                            alert('File size exceeds 10MB');
+                            e.target.value = null;
+                            return;
+                          }
+                          setSelectedFile(file);
+                        }
+                      }}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors">
+                      <FileText className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                      <p className="text-slate-600 font-medium">Click to upload or drag and drop</p>
+                      <p className="text-sm text-slate-400">PDF up to 10MB</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-indigo-600 shadow-sm mr-4">
+                        <FileText className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">{selectedFile.name}</p>
+                        <p className="text-xs text-slate-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB • Uploaded successfully</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setSelectedFile(null)}
+                      className="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -226,6 +279,10 @@ const NewTraining = () => {
           <button
             type="button"
             onClick={() => {
+              if (!title.trim()) {
+                alert('Please enter a training title');
+                return;
+              }
               // Validate percentages
               if (testTypes.mcq && testTypes.fillInBlanks && (percentages.mcq + percentages.fillInBlanks !== 100)) {
                 alert('Total percentage must equal 100%');
@@ -239,7 +296,13 @@ const NewTraining = () => {
               };
 
               // Navigate to preview
-              navigate('/admin/test-preview', { state: { config } });
+              navigate('/admin/test-preview', { 
+                state: { 
+                  config,
+                  title,
+                  contentType
+                } 
+              });
             }}
             className="flex items-center bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95"
           >

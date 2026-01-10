@@ -6,7 +6,11 @@ import { mcqPool, fibPool } from '../../data/questionBank';
 const GeneratedTest = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { config } = location.state || { config: { mcq: 70, fib: 30 } }; // Default fallback
+  const { config, title, contentType } = location.state || { 
+    config: { mcq: 70, fib: 30 },
+    title: 'Untitled Training',
+    contentType: 'youtube'
+  };
 
   const [questions, setQuestions] = useState([]);
   const [isSaved, setIsSaved] = useState(false);
@@ -38,6 +42,23 @@ const GeneratedTest = () => {
   }, []);
 
   const handleSave = () => {
+    // Create new training object
+    const newTraining = {
+      id: Date.now(),
+      title: title,
+      type: contentType,
+      thumbnail: contentType === 'youtube' ? "https://img.youtube.com/vi/8Jv47_VIBOQ/maxresdefault.jpg" : null,
+      duration: contentType === 'youtube' ? "20 mins" : "12 pages",
+      candidates: 0,
+      status: "Active",
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      questions: questions
+    };
+
+    // Save to localStorage
+    const existingTrainings = JSON.parse(localStorage.getItem('training_modules') || '[]');
+    localStorage.setItem('training_modules', JSON.stringify([newTraining, ...existingTrainings]));
+
     setIsSaved(true);
     setTimeout(() => {
       navigate('/admin/dashboard');

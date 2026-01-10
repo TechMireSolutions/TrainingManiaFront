@@ -16,6 +16,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import NewTraining from './NewTraining';
+import TrainingList from './TrainingList';
+import CandidateRegistration from './CandidateRegistration';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -109,6 +111,10 @@ const AdminDashboard = () => {
         <main className="flex-1 p-8 overflow-y-auto">
           {activeTab === 'new-training' ? (
             <NewTraining />
+          ) : activeTab === 'modules' ? (
+            <TrainingList onCreateNew={() => setActiveTab('new-training')} />
+          ) : activeTab === 'candidates' ? (
+            <CandidateRegistration />
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-slate-400">
               <LayoutDashboard className="w-16 h-16 mb-4 opacity-20" />
