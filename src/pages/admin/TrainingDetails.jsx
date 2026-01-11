@@ -141,6 +141,16 @@ const TrainingDetails = () => {
                                     className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 outline-none"
                                 />
                             </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Total Questions to Show</label>
+                                <input
+                                    type="number"
+                                    value={training.totalQuestions || training.questions?.length || 20}
+                                    onChange={(e) => setTraining({ ...training, totalQuestions: parseInt(e.target.value) || 0 })}
+                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 outline-none"
+                                />
+                                <p className="text-xs text-slate-400 mt-1">Limit the number of questions displayed in the quiz.</p>
+                            </div>
                         </div>
 
                         <div className="mt-6 flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">

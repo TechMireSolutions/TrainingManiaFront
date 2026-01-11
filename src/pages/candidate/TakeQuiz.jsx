@@ -16,6 +16,8 @@ const TakeQuiz = () => {
         { role: 'assistant', text: 'Hi! I am your AI assistant. I can help you clarify questions or concepts if you get stuck. I cannot give you direct answers though! Good luck.' }
     ]);
     const [inputMessage, setInputMessage] = useState('');
+    const [showTimeoutScreen, setShowTimeoutScreen] = useState(false);
+    const [isReviewing, setIsReviewing] = useState(false);
 
     useEffect(() => {
         const allTrainings = JSON.parse(localStorage.getItem('training_modules') || '[]');
@@ -35,6 +37,12 @@ const TakeQuiz = () => {
         } else {
             setTimeLeft(20 * 60); // Default 20 mins
         }
+
+        // Respect Total Questions Limit
+        const limit = found.totalQuestions || found.questions.length;
+        const boundedQuestions = found.questions.slice(0, limit);
+        setTraining({ ...found, questions: boundedQuestions });
+
     }, [id, navigate]);
 
     // Timer Logic
@@ -114,9 +122,13 @@ const TakeQuiz = () => {
     const handleSubmit = (auto = false) => {
         if (!auto && !window.confirm('Are you sure you want to submit the quiz?')) return;
 
-        setIsSubmitting(true);
+        // setIsSubmitting(true); // Assuming setIsSubmitting is defined elsewhere or removed
         const results = calculateResult();
         setResult(results);
+
+        if (auto) {
+            setShowTimeoutScreen(true);
+        }
 
         const allEnrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
         const candidate = JSON.parse(localStorage.getItem('current_candidate'));
@@ -139,7 +151,85 @@ const TakeQuiz = () => {
 
     if (!training) return <div>Loading...</div>;
 
+    if (showTimeoutScreen) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+                <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center animate-fade-in-up">
+                    <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Clock className="w-10 h-10" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Time's Up!</h2>
+                    <p className="text-slate-500 mb-8">
+                        The allotted time for this test has expired. Your progress has been automatically saved and submitted.
+                    </p>
+                    <button
+                        onClick={() => setShowTimeoutScreen(false)}
+                        className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all text-lg shadow-lg shadow-indigo-200"
+                    >
+                        View Results
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     if (result) {
+        if (isReviewing) {
+            return (
+                <div className="min-h-screen bg-slate-50 p-8">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="flex items-center justify-between mb-8">
+                            <h1 className="text-2xl font-bold text-slate-900">Answer Review</h1>
+                            <button
+                                onClick={() => setIsReviewing(false)}
+                                className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-300 transition-colors"
+                            >
+                                Back to Results
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            {training.questions.map((q, index) => {
+                                const userAnswer = answers[index];
+                                const correctValue = q.correctAnswer || q.answer;
+                                const isCorrect = userAnswer?.toString().toLowerCase().trim() === correctValue?.toString().toLowerCase().trim();
+
+                                return (
+                                    <div key={index} className={`p-6 rounded-xl border-2 ${isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
+                                        <div className="flex gap-4">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white shrink-0 ${isCorrect ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="text-lg font-medium text-slate-900 mb-4">{q.question}</h3>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-1">Your Answer</span>
+                                                        <div className={`p-3 rounded-lg font-medium ${isCorrect ? 'text-emerald-700 bg-emerald-100' : 'text-red-700 bg-red-100'}`}>
+                                                            {userAnswer || <span className="italic text-slate-400">Skipped</span>}
+                                                        </div>
+                                                    </div>
+                                                    {!isCorrect && (
+                                                        <div>
+                                                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-1">Correct Answer</span>
+                                                            <div className="p-3 rounded-lg font-medium text-emerald-700 bg-emerald-100">
+                                                                {correctValue}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
                 <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
@@ -163,12 +253,31 @@ const TakeQuiz = () => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => navigate('/candidate/dashboard')}
-                        className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all"
-                    >
-                        Return to Dashboard
-                    </button>
+                    <div className="space-y-3">
+                        {result.isPassed && (
+                            <button
+                                onClick={() => navigate(`/candidate/certificate/${training.id}`)}
+                                className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center"
+                            >
+                                <CheckCircle className="w-5 h-5 mr-2" />
+                                Get Certificate
+                            </button>
+                        )}
+
+                        <button
+                            onClick={() => setIsReviewing(true)}
+                            className="w-full py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold hover:border-indigo-600 hover:text-indigo-600 transition-all"
+                        >
+                            Review Answers
+                        </button>
+
+                        <button
+                            onClick={() => navigate('/candidate/dashboard')}
+                            className="w-full py-3 text-slate-400 hover:text-slate-600 font-medium transition-all"
+                        >
+                            Return to Dashboard
+                        </button>
+                    </div>
                 </div>
             </div>
         );

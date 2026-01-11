@@ -6,10 +6,11 @@ import { mcqPool, fibPool } from '../../data/questionBank';
 const GeneratedTest = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { config, title, contentType, videoUrl, settings } = location.state || {
+  const { config, title, contentType, videoType, videoUrl, settings } = location.state || {
     config: { mcq: 70, fib: 30 },
     title: 'Untitled Training',
     contentType: 'youtube',
+    videoType: 'youtube',
     videoUrl: '',
     settings: {
       totalMarks: 100,
@@ -25,7 +26,7 @@ const GeneratedTest = () => {
   const [isSaved, setIsSaved] = useState(false);
 
   const generateQuestions = () => {
-    const totalQuestions = 20; // Fixed total for MVP
+    const totalQuestions = config.totalQuestions || 20; // Use config or default
     const mcqCount = Math.round((totalQuestions * config.mcq) / 100);
     const fibCount = totalQuestions - mcqCount;
 
@@ -59,16 +60,18 @@ const GeneratedTest = () => {
       return (match && match[2].length === 11) ? match[2] : '8Jv47_VIBOQ';
     };
 
-    const videoId = getYoutubeId(videoUrl);
+    const videoId = (videoType === 'youtube') ? getYoutubeId(videoUrl) : null;
 
     // Create new training object
     const newTraining = {
       id: Date.now(),
       title: title,
-      type: contentType,
+      type: contentType || (videoUrl ? 'video' : 'pdf'),
+      videoType: videoType || 'youtube',
       videoUrl: videoUrl,
-      thumbnail: contentType === 'youtube' ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
-      duration: contentType === 'youtube' ? "20 mins" : "12 pages",
+      pdfFile: location.state.pdfFile, // Save PDF filename
+      thumbnail: (videoType === 'youtube' && videoUrl) ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
+      duration: videoUrl ? "20 mins" : "12 pages",
       candidates: 0,
       status: "Active",
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),

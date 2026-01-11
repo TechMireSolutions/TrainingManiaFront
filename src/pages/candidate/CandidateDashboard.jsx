@@ -14,6 +14,7 @@ const CandidateDashboard = () => {
     { role: 'assistant', text: 'Hello! I am your AI learning assistant. As you watch the video, feel free to ask me anything about the content. I am here to help you understand!' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
+  const [isPdfDownloaded, setIsPdfDownloaded] = useState(false);
 
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
@@ -54,6 +55,8 @@ const CandidateDashboard = () => {
           videoUrl: trainingDetails?.videoUrl || '',
           videoUrl: trainingDetails?.videoUrl || '',
           thumbnail: trainingDetails?.thumbnail || '',
+          pdfFile: trainingDetails?.pdfFile || '',
+          videoType: trainingDetails?.videoType || 'youtube',
           trainingId: trainingDetails?.id
         };
       });
@@ -69,6 +72,22 @@ const CandidateDashboard = () => {
   const handleStartLearning = (course) => {
     setCurrentCourse(course);
     setActiveTab('player');
+    setIsPdfDownloaded(false); // Reset for new session
+  };
+
+  const handleDownloadPdf = () => {
+    // Simulate real download with Blob
+    const dummyContent = `Training Manual for ${currentCourse.training}\n\nThis is a dummy PDF file generated for demonstration purposes.`;
+    const blob = new Blob([dummyContent], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', currentCourse.pdfFile || 'Manual.pdf');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setIsPdfDownloaded(true);
   };
 
   const getYoutubeEmbedUrl = (url) => {
@@ -185,20 +204,32 @@ const CandidateDashboard = () => {
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
                   <div className="aspect-video w-full bg-black">
-                    {currentCourse.videoUrl ? (
-                      <iframe
+                    {currentCourse.videoType === 'upload' ? (
+                      <video
                         width="100%"
                         height="100%"
-                        src={getYoutubeEmbedUrl(currentCourse.videoUrl)}
-                        title={currentCourse.training}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
+                        controls
+                        className="w-full h-full object-contain bg-black"
+                        src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white">
-                        <p>No video available for this course.</p>
-                      </div>
+                      currentCourse.videoUrl ? (
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={getYoutubeEmbedUrl(currentCourse.videoUrl)}
+                          title={currentCourse.training}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white">
+                          <p>No video available for this course.</p>
+                        </div>
+                      )
                     )}
                   </div>
                 </div>
@@ -206,12 +237,34 @@ const CandidateDashboard = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
                   <h1 className="text-2xl font-bold text-slate-900 mb-2">{currentCourse.training}</h1>
                   <p className="text-slate-500 mb-6">
-                    Watch the video carefully. You will need to complete the assessment after this.
+                    Watch the video and download the training manual. You must download the manual to unlock the quiz.
                   </p>
+
+                  {/* Course Materials */}
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8 flex items-center justify-between">
+                    <div className="flex items-center">
+                      <FileText className="w-8 h-8 text-indigo-600 mr-3" />
+                      <div>
+                        <h4 className="font-bold text-slate-900">Training Manual</h4>
+                        <p className="text-sm text-slate-500">{currentCourse.pdfFile || 'Manual.pdf'}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleDownloadPdf}
+                      className={`px-4 py-2 rounded-lg font-bold text-sm transition-all border ${isPdfDownloaded
+                        ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                        : 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50'}`}
+                    >
+                      {isPdfDownloaded ? 'Downloaded' : 'Download PDF'}
+                    </button>
+                  </div>
 
                   <button
                     onClick={() => navigate(`/candidate/take-test/${currentCourse.trainingId}`)}
-                    className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
+                    disabled={!isPdfDownloaded}
+                    className={`flex items-center px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${isPdfDownloaded
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}
                   >
                     <CheckCircle className="w-5 h-5 mr-2" />
                     Attempt Quiz
@@ -276,3 +329,4 @@ const CandidateDashboard = () => {
 };
 
 export default CandidateDashboard;
+
