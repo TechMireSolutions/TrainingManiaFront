@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, User, LayoutDashboard, BookOpen, PlayCircle, CheckCircle, Clock, FileText, HelpCircle, ArrowRight, MessageSquare } from 'lucide-react';
+import { LogOut, User, LayoutDashboard, BookOpen, PlayCircle, CheckCircle, Clock, FileText, HelpCircle, ArrowRight, MessageSquare, Award } from 'lucide-react';
 
 const CandidateDashboard = () => {
   const navigate = useNavigate();
@@ -8,6 +8,10 @@ const CandidateDashboard = () => {
   const [activeTab, setActiveTab] = useState('my-courses');
   const [myCourses, setMyCourses] = useState([]);
   const [currentCourse, setCurrentCourse] = useState(null);
+  const [candidateName, setCandidateName] = useState('');
+  const [hasAttempts, setHasAttempts] = useState(false);
+  const [nameError, setNameError] = useState('');
+  const [saveStatus, setSaveStatus] = useState('');
 
   // AI Agent State
   const [messages, setMessages] = useState([
@@ -40,6 +44,7 @@ const CandidateDashboard = () => {
     }
     const candidateData = JSON.parse(stored);
     setCandidate(candidateData);
+    setCandidateName(candidateData.name || candidateData.email.split('@')[0]);
 
     // Load Enrollments & Link with Training Details
     const allEnrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
@@ -62,6 +67,9 @@ const CandidateDashboard = () => {
       });
 
     setMyCourses(candidateCourses);
+    // Check if any course has been attempted (Completed or Failed)
+    const attempts = candidateCourses.some(c => c.status === 'Completed' || c.status === 'Failed');
+    setHasAttempts(attempts);
   }, [navigate]);
 
   const handleLogout = () => {
@@ -88,6 +96,28 @@ const CandidateDashboard = () => {
     document.body.removeChild(link);
 
     setIsPdfDownloaded(true);
+  };
+
+  const handleNameChange = (e) => {
+    setCandidateName(e.target.value);
+    if (e.target.value.trim()) {
+      setNameError('');
+    }
+    setSaveStatus('');
+  };
+
+  const handleSaveName = () => {
+    if (!candidateName.trim()) {
+      setNameError('Name is required');
+      return;
+    }
+
+    const updatedCandidate = { ...candidate, name: candidateName.trim() };
+    setCandidate(updatedCandidate);
+    localStorage.setItem('current_candidate', JSON.stringify(updatedCandidate));
+    setSaveStatus('Saved successfully!');
+
+    setTimeout(() => setSaveStatus(''), 3000);
   };
 
   const getYoutubeEmbedUrl = (url) => {
@@ -135,11 +165,69 @@ const CandidateDashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation Tabs */}
+        {hasAttempts && activeTab !== 'player' && (
+          <div className="flex border-b border-slate-200 mb-8">
+            <button
+              onClick={() => setActiveTab('my-courses')}
+              className={`px-6 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === 'my-courses' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+            >
+              My Courses
+            </button>
+            <button
+              onClick={() => setActiveTab('certificates')}
+              className={`px-6 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === 'certificates' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+            >
+              Certificates
+            </button>
+            <button
+              onClick={() => setActiveTab('results')}
+              className={`px-6 py-3 font-bold text-sm transition-all border-b-2 ${activeTab === 'results' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+            >
+              Results
+            </button>
+          </div>
+        )}
+
         {activeTab === 'my-courses' && (
           <div>
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-slate-900">My Courses</h1>
-              <p className="text-slate-500">Access your assigned training modules.</p>
+            {!hasAttempts && (
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold text-slate-900">My Courses</h1>
+                <p className="text-slate-500">Access your assigned training modules.</p>
+              </div>
+            )}
+
+            {/* Candidate Name Input Section */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-slate-900 mb-1">
+                  Your Profile Name <span className="text-red-500">*</span>
+                </h2>
+                <p className="text-sm text-slate-500">This name will appear on your certificates. Please ensure it is correct.</p>
+              </div>
+              <div className="w-full md:w-auto min-w-[300px]">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-400" />
+                    <input
+                      type="text"
+                      value={candidateName}
+                      onChange={handleNameChange}
+                      placeholder="Enter full name for certificate"
+                      className={`w-full pl-10 pr-4 py-3 rounded-xl border ${nameError ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-100'} focus:ring-2 outline-none font-medium text-slate-900 transition-all`}
+                    />
+                  </div>
+                  <button
+                    onClick={handleSaveName}
+                    className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100"
+                  >
+                    Save
+                  </button>
+                </div>
+                {nameError && <p className="text-red-500 text-xs mt-2 font-medium ml-1">{nameError}</p>}
+                {saveStatus && <p className="text-emerald-600 text-xs mt-2 font-medium ml-1">{saveStatus}</p>}
+              </div>
             </div>
 
             {myCourses.length > 0 ? (
@@ -186,6 +274,80 @@ const CandidateDashboard = () => {
                 </p>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'certificates' && (
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myCourses.filter(c => c.status === 'Completed').map(course => (
+                <div key={course.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+                    <Award className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">{course.training}</h3>
+                  <p className="text-sm text-slate-500 mb-6">Completed on {course.lastAttemptDate || course.date}</p>
+                  <button
+                    onClick={() => navigate(`/candidate/certificate/${course.trainingId}`)}
+                    className="w-full py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+                  >
+                    View Certificate
+                  </button>
+                </div>
+              ))}
+              {myCourses.filter(c => c.status === 'Completed').length === 0 && (
+                <div className="col-span-3 text-center py-12">
+                  <p className="text-slate-500">No certificates available yet. Complete a course to earn one!</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'results' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="px-6 py-4 text-sm font-bold text-slate-700">Training Module</th>
+                  <th className="px-6 py-4 text-sm font-bold text-slate-700">Date</th>
+                  <th className="px-6 py-4 text-sm font-bold text-slate-700">Status</th>
+                  <th className="px-6 py-4 text-sm font-bold text-slate-700">Score</th>
+                  <th className="px-6 py-4 text-sm font-bold text-slate-700">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {myCourses.filter(c => c.status !== 'Enrolled').map(course => (
+                  <tr key={course.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-slate-900">{course.training}</td>
+                    <td className="px-6 py-4 text-slate-500">{course.lastAttemptDate || '-'}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${course.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                        {course.status === 'Completed' ? 'Passed' : 'Failed'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-slate-900">{course.score ? parseFloat(course.score).toFixed(1) : '0'}</td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => navigate(`/candidate/take-test/${course.trainingId}`, { state: { mode: 'review', answers: course.userAnswers } })}
+                        disabled={!course.userAnswers}
+                        className={`text-sm font-bold transition-colors ${course.userAnswers ? 'text-indigo-600 hover:text-indigo-800' : 'text-slate-300 cursor-not-allowed'}`}
+                        title={!course.userAnswers ? "Review not available for older tests" : "Review your answers"}
+                      >
+                        Review
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {myCourses.filter(c => c.status !== 'Enrolled').length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-12 text-center text-slate-500">
+                      No results found. Attempt a quiz to see results here.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         )}
 
@@ -240,7 +402,6 @@ const CandidateDashboard = () => {
                     Watch the video and download the training manual. You must download the manual to unlock the quiz.
                   </p>
 
-                  {/* Course Materials */}
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8 flex items-center justify-between">
                     <div className="flex items-center">
                       <FileText className="w-8 h-8 text-indigo-600 mr-3" />
@@ -274,24 +435,28 @@ const CandidateDashboard = () => {
 
               {/* AI Agent Column */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[600px] sticky top-24">
+                <div className="bg-white rounded-2xl shadow-xl shadow-indigo-100 border-2 border-indigo-100 flex flex-col h-[600px] sticky top-24 ring-1 ring-indigo-50 overflow-hidden transform transition-all hover:shadow-2xl hover:shadow-indigo-200/50">
 
                   {/* AI Header */}
-                  <div className="p-4 border-b border-slate-200 bg-slate-50 rounded-t-2xl flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md">
-                      <HelpCircle className="w-5 h-5" />
+                  <div className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center gap-3 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white shadow-inner border border-white/20">
+                      <HelpCircle className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900">AI Learning Assistant</h3>
-                      <p className="text-xs text-slate-500">Ask doubts while watching</p>
+                    <div className="flex-1 relative z-10">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-white text-lg">AI Assistant</h3>
+                        <span className="px-2 py-0.5 bg-white/20 backdrop-blur-md rounded text-[10px] font-bold text-white border border-white/10">PRO</span>
+                      </div>
+                      <p className="text-xs text-indigo-100 font-medium opacity-90">Ask doubts while watching</p>
                     </div>
                   </div>
 
                   {/* Chat Area */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/30">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 scroll-smooth">
                     {messages.map((msg, i) => (
                       <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'}`}>
+                        <div className={`max-w-[85%] p-3.5 rounded-2xl text-sm shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none'}`}>
                           {msg.text}
                         </div>
                       </div>

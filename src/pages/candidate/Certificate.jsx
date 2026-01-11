@@ -81,13 +81,9 @@ const Certificate = () => {
                     <p className="text-lg text-slate-500 mb-2">This is to certify that</p>
 
                     <div className="mb-8 px-12">
-                        <input
-                            type="text"
-                            value={candidateName}
-                            onChange={(e) => setCandidateName(e.target.value)}
-                            className="text-4xl font-serif font-bold text-slate-900 text-center w-full border-b-2 border-slate-200 focus:border-indigo-600 outline-none bg-transparent py-2 transition-colors placeholder:text-slate-300"
-                            placeholder="Candidate Name"
-                        />
+                        <h1 className="text-4xl font-serif font-bold text-slate-900 text-center w-full border-b-2 border-slate-200 py-2">
+                            {candidateName}
+                        </h1>
                     </div>
 
                     <p className="text-lg text-slate-500 mb-4">has successfully completed the training module</p>

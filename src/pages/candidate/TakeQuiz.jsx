@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRight, CheckCircle, AlertTriangle, Clock, HelpCircle, Save } from 'lucide-react';
 
 const TakeQuiz = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [training, setTraining] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
@@ -43,7 +44,20 @@ const TakeQuiz = () => {
         const boundedQuestions = found.questions.slice(0, limit);
         setTraining({ ...found, questions: boundedQuestions });
 
-    }, [id, navigate]);
+        // Handle Review Mode
+        if (location.state && location.state.mode === 'review' && location.state.answers) {
+            setAnswers(location.state.answers);
+
+            // Calculate result immediately for review display context if needed, 
+            // though we mainly just want to show the review screen.
+            // We can force result state to bypass timer logic.
+            // But we need the questions to match the answers.
+            setIsReviewing(true);
+            // Create a dummy result to stop the timer
+            setResult({ isPassed: true, obtainedMarks: 0, totalMarks: 0, correctCount: 0, incorrectCount: 0 });
+        }
+
+    }, [id, navigate, location.state]);
 
     // Timer Logic
     useEffect(() => {
@@ -140,7 +154,8 @@ const TakeQuiz = () => {
                     status: results.isPassed ? 'Completed' : 'Failed',
                     score: results.obtainedMarks,
                     attempts: (e.attempts || 0) + 1,
-                    lastAttemptDate: new Date().toLocaleDateString()
+                    lastAttemptDate: new Date().toLocaleDateString(),
+                    userAnswers: answers // Save user answers for review
                 };
             }
             return e;
