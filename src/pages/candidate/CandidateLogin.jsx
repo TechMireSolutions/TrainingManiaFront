@@ -25,7 +25,10 @@ const CandidateLogin = () => {
     // Simulate API delay
     setTimeout(() => {
       const candidates = JSON.parse(localStorage.getItem('candidates_list') || '[]');
-      const candidate = candidates.find(c => c.email.toLowerCase() === email.toLowerCase());
+      const candidate = candidates.find(c => {
+        const cEmail = typeof c === 'string' ? c : c.email;
+        return cEmail && cEmail.toLowerCase() === email.toLowerCase();
+      });
 
       if (!candidate) {
         setError('Candidate not found. Please contact your administrator.');
@@ -76,16 +79,23 @@ const CandidateLogin = () => {
       // Update candidate in localStorage
       const candidates = JSON.parse(localStorage.getItem('candidates_list') || '[]');
       const updatedCandidates = candidates.map(c => {
-        if (c.email.toLowerCase() === email.toLowerCase()) {
-          return { ...c, password: newPassword };
+        const cEmail = typeof c === 'string' ? c : c.email;
+        if (cEmail && cEmail.toLowerCase() === email.toLowerCase()) {
+          // Verify we preserve object structure or convert string to object
+          return typeof c === 'string'
+            ? { email: c, password: newPassword }
+            : { ...c, password: newPassword };
         }
         return c;
       });
 
       localStorage.setItem('candidates_list', JSON.stringify(updatedCandidates));
-      
+
       // Set current session
-      const candidate = updatedCandidates.find(c => c.email.toLowerCase() === email.toLowerCase());
+      const candidate = updatedCandidates.find(c => {
+        const cEmail = typeof c === 'string' ? c : c.email;
+        return cEmail && cEmail.toLowerCase() === email.toLowerCase();
+      });
       localStorage.setItem('current_candidate', JSON.stringify(candidate));
 
       navigate('/candidate/dashboard');
@@ -230,7 +240,7 @@ const CandidateLogin = () => {
             </form>
           )}
         </div>
-        
+
 
       </div>
     </div>

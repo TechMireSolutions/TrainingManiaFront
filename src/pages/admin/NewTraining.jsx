@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  Youtube, 
-  FileText, 
-  CheckSquare, 
-  Type, 
-  AlertCircle, 
+import {
+  Youtube,
+  FileText,
+  CheckSquare,
+  Type,
+  AlertCircle,
   Save,
   Plus,
   X
@@ -25,7 +25,11 @@ const NewTraining = () => {
     fillInBlanks: 0
   });
   const [attempts, setAttempts] = useState(3);
+  const [testDuration, setTestDuration] = useState(20);
+  const [totalMarks, setTotalMarks] = useState('');
+  const [passingMarks, setPassingMarks] = useState('');
   const [negativeMarking, setNegativeMarking] = useState(false);
+  const [negativeMarkingValue, setNegativeMarkingValue] = useState(0.25);
 
   const [videoUrl, setVideoUrl] = useState('');
 
@@ -59,29 +63,27 @@ const NewTraining = () => {
             <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mr-3">1</div>
             Course Content
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <button
               type="button"
               onClick={() => setContentType('youtube')}
-              className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${
-                contentType === 'youtube'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-100 hover:border-slate-200 text-slate-500'
-              }`}
+              className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${contentType === 'youtube'
+                ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                : 'border-slate-100 hover:border-slate-200 text-slate-500'
+                }`}
             >
               <Youtube className="w-8 h-8 mb-2" />
               <span className="font-semibold">YouTube Video</span>
             </button>
-            
+
             <button
               type="button"
               onClick={() => setContentType('pdf')}
-              className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${
-                contentType === 'pdf'
-                  ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                  : 'border-slate-100 hover:border-slate-200 text-slate-500'
-              }`}
+              className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${contentType === 'pdf'
+                ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                : 'border-slate-100 hover:border-slate-200 text-slate-500'
+                }`}
             >
               <FileText className="w-8 h-8 mb-2" />
               <span className="font-semibold">PDF Document</span>
@@ -138,7 +140,7 @@ const NewTraining = () => {
                         <p className="text-xs text-slate-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB • Uploaded successfully</p>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setSelectedFile(null)}
                       className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
                     >
@@ -210,7 +212,7 @@ const NewTraining = () => {
                 </div>
               )}
             </div>
-            
+
             {(percentages.mcq + percentages.fillInBlanks !== 100) && (
               <div className="flex items-center text-amber-700 text-sm bg-amber-50 p-3 rounded-lg border border-amber-200">
                 <AlertCircle className="w-4 h-4 mr-2" />
@@ -232,6 +234,8 @@ const NewTraining = () => {
               <label className="block text-sm font-semibold text-slate-700 mb-2">Total Marks</label>
               <input
                 type="number"
+                value={totalMarks}
+                onChange={(e) => setTotalMarks(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
                 placeholder="e.g. 100"
               />
@@ -240,6 +244,8 @@ const NewTraining = () => {
               <label className="block text-sm font-semibold text-slate-700 mb-2">Passing Marks</label>
               <input
                 type="number"
+                value={passingMarks}
+                onChange={(e) => setPassingMarks(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
                 placeholder="e.g. 60"
               />
@@ -253,6 +259,15 @@ const NewTraining = () => {
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Test Duration (Mins)</label>
+              <input
+                type="number"
+                value={testDuration}
+                onChange={(e) => setTestDuration(parseInt(e.target.value))}
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-0 outline-none transition-all text-slate-900"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
@@ -262,7 +277,7 @@ const NewTraining = () => {
               </div>
               <span className="ml-3 text-sm font-bold text-slate-900">Enable Negative Marking</span>
             </div>
-            
+
             {negativeMarking && (
               <div className="flex items-center">
                 <span className="text-sm text-slate-500 mr-3">Deduct per wrong answer:</span>
@@ -270,6 +285,8 @@ const NewTraining = () => {
                   <input
                     type="number"
                     step="0.25"
+                    value={negativeMarkingValue}
+                    onChange={(e) => setNegativeMarkingValue(parseFloat(e.target.value))}
                     className="w-full outline-none font-bold text-red-500 bg-transparent"
                     placeholder="0.25"
                   />
@@ -292,7 +309,7 @@ const NewTraining = () => {
                 alert('Total percentage must equal 100%');
                 return;
               }
-              
+
               // Prepare config
               const config = {
                 mcq: testTypes.mcq ? percentages.mcq : 0,
@@ -300,13 +317,24 @@ const NewTraining = () => {
               };
 
               // Navigate to preview
-              navigate('/admin/test-preview', { 
-                state: { 
+              navigate('/admin/test-preview', {
+                state: {
                   config,
                   title,
                   contentType,
-                  videoUrl
-                } 
+                  config,
+                  title,
+                  contentType,
+                  videoUrl,
+                  settings: {
+                    totalMarks: parseInt(totalMarks) || 100,
+                    passingMarks: parseInt(passingMarks) || 40,
+                    attempts: attempts,
+                    testDuration: testDuration || 20,
+                    negativeMarking: negativeMarking,
+                    negativeMarkingValue: negativeMarking ? negativeMarkingValue : 0
+                  }
+                }
               });
             }}
             className="flex items-center bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95"

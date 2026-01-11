@@ -6,11 +6,19 @@ import { mcqPool, fibPool } from '../../data/questionBank';
 const GeneratedTest = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { config, title, contentType, videoUrl } = location.state || { 
+  const { config, title, contentType, videoUrl, settings } = location.state || {
     config: { mcq: 70, fib: 30 },
     title: 'Untitled Training',
     contentType: 'youtube',
-    videoUrl: ''
+    videoUrl: '',
+    settings: {
+      totalMarks: 100,
+      passingMarks: 40,
+      attempts: 3,
+      testDuration: 20,
+      negativeMarking: false,
+      negativeMarkingValue: 0
+    }
   };
 
   const [questions, setQuestions] = useState([]);
@@ -26,7 +34,7 @@ const GeneratedTest = () => {
     const selectedMcqs = shuffledMcqs.slice(0, mcqCount).map(q => ({ ...q, type: 'mcq' }));
 
     const shuffledFibs = [...fibPool].sort(() => 0.5 - Math.random());
-    const selectedFibs = shuffledFibs.slice(0, fibCount).map(q => ({ question: q, type: 'fib' }));
+    const selectedFibs = shuffledFibs.slice(0, fibCount).map(q => ({ ...q, type: 'fib' }));
 
     // Combine
     let combined = [...selectedMcqs, ...selectedFibs];
@@ -64,7 +72,8 @@ const GeneratedTest = () => {
       candidates: 0,
       status: "Active",
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      questions: questions
+      questions: questions,
+      ...settings // Spread the settings (totalMarks, passingMarks, attempts, negativeMarking)
     };
 
     // Save to localStorage
@@ -88,7 +97,7 @@ const GeneratedTest = () => {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Dashboard
           </button>
-          
+
           <div className="flex gap-3">
             <button
               onClick={generateQuestions}
@@ -129,14 +138,13 @@ const GeneratedTest = () => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-xs font-bold px-2 py-1 rounded uppercase tracking-wide ${
-                        q.type === 'mcq' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
-                      }`}>
+                      <span className={`text-xs font-bold px-2 py-1 rounded uppercase tracking-wide ${q.type === 'mcq' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
+                        }`}>
                         {q.type === 'mcq' ? 'Multiple Choice' : 'Fill in Blank'}
                       </span>
                     </div>
                     <p className="text-lg font-medium text-slate-900 mb-4">{q.question}</p>
-                    
+
                     {q.type === 'mcq' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {q.options.map((opt, i) => (
@@ -147,7 +155,7 @@ const GeneratedTest = () => {
                         ))}
                       </div>
                     )}
-                    
+
                     {q.type === 'fib' && (
                       <div className="p-3 bg-white rounded-lg border border-slate-200 border-dashed text-slate-400 italic">
                         Answer will be input here...
@@ -164,11 +172,10 @@ const GeneratedTest = () => {
           <button
             onClick={handleSave}
             disabled={isSaved}
-            className={`flex items-center px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all transform hover:-translate-y-1 ${
-              isSaved 
-                ? 'bg-emerald-600 text-white cursor-default' 
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
-            }`}
+            className={`flex items-center px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all transform hover:-translate-y-1 ${isSaved
+              ? 'bg-emerald-600 text-white cursor-default'
+              : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'
+              }`}
           >
             {isSaved ? (
               <>
