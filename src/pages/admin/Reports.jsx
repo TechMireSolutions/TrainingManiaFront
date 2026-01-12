@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BarChart2, 
   Search, 
@@ -10,69 +10,51 @@ import {
 } from 'lucide-react';
 
 const Reports = () => {
-  // Mock Data for Reports
-  const [reports] = useState([
-    {
-      id: 1,
-      candidate: "alex.johnson@example.com",
-      training: "WordPress Fundamentals",
-      score: 85,
-      totalMarks: 100,
-      correct: 17,
-      wrong: 3,
-      skipped: 0,
-      status: "Passed",
-      date: "Jan 10, 2026"
-    },
-    {
-      id: 2,
-      candidate: "sarah.williams@example.com",
-      training: "Cyber Security Basics",
-      score: 45,
-      totalMarks: 100,
-      correct: 9,
-      wrong: 11,
-      skipped: 0,
-      status: "Failed",
-      date: "Jan 09, 2026"
-    },
-    {
-      id: 3,
-      candidate: "michael.brown@company.net",
-      training: "Advanced React Patterns",
-      score: 92,
-      totalMarks: 100,
-      correct: 18,
-      wrong: 1,
-      skipped: 1,
-      status: "Passed",
-      date: "Jan 08, 2026"
-    },
-    {
-      id: 4,
-      candidate: "emily.davis@provider.org",
-      training: "WordPress Fundamentals",
-      score: 70,
-      totalMarks: 100,
-      correct: 14,
-      wrong: 6,
-      skipped: 0,
-      status: "Passed",
-      date: "Jan 08, 2026"
-    },
-    {
-      id: 5,
-      candidate: "david.wilson@studio.io",
-      training: "Cyber Security Basics",
-      score: 30,
-      totalMarks: 100,
-      correct: 6,
-      wrong: 14,
-      skipped: 0,
-      status: "Failed",
-      date: "Jan 07, 2026"
+  const [reports, setReports] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    // Fetch real data from localStorage
+    const storedResults = JSON.parse(localStorage.getItem('test_results') || '[]');
+    setReports(storedResults);
+  }, []);
+
+  const handleExportCSV = () => {
+    if (reports.length === 0) {
+      alert("No data to export");
+      return;
     }
-  ]);
+
+    const headers = ["Candidate", "Training Module", "Score", "Total Marks", "Correct", "Wrong", "Skipped", "Status", "Date"];
+    const csvRows = [
+      headers.join(','), // Header row
+      ...reports.map(row => [
+        row.candidate,
+        `"${row.training}"`, // Quote training name to handle commas
+        row.score,
+        row.totalMarks,
+        row.correct,
+        row.wrong,
+        row.skipped,
+        row.status,
+        `"${row.date}"`
+      ].join(','))
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "performance_reports.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const filteredReports = reports.filter(report => 
+    report.candidate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.training.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="w-full">
@@ -86,7 +68,10 @@ const Reports = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </button>
-          <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-lg shadow-indigo-200">
+          <button 
+            onClick={handleExportCSV}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-lg shadow-indigo-200"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </button>
@@ -101,6 +86,8 @@ const Reports = () => {
             <input 
               type="text" 
               placeholder="Search candidate or training..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/50 w-full sm:w-64 text-slate-900 placeholder:text-slate-400"
             />
           </div>
@@ -119,51 +106,59 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {reports.map((report) => (
-                <tr key={report.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-slate-900">{report.candidate}</td>
-                  <td className="px-6 py-4 text-slate-500">{report.training}</td>
-                  <td className="px-6 py-4 text-center">
-                    <span className={`font-bold ${report.score >= 60 ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {report.score}/{report.totalMarks}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-4 text-xs">
-                      <div className="flex items-center text-emerald-600" title="Correct">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        {report.correct}
+              {filteredReports.length > 0 ? (
+                filteredReports.map((report) => (
+                  <tr key={report.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-slate-900">{report.candidate}</td>
+                    <td className="px-6 py-4 text-slate-500">{report.training}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`font-bold ${report.score >= 40 ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {report.score}/{report.totalMarks}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-4 text-xs">
+                        <div className="flex items-center text-emerald-600" title="Correct">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          {report.correct}
+                        </div>
+                        <div className="flex items-center text-red-600" title="Wrong">
+                          <XCircle className="w-3 h-3 mr-1" />
+                          {report.wrong}
+                        </div>
+                        <div className="flex items-center text-slate-500" title="Skipped">
+                          <AlertCircle className="w-3 h-3 mr-1" />
+                          {report.skipped}
+                        </div>
                       </div>
-                      <div className="flex items-center text-red-600" title="Wrong">
-                        <XCircle className="w-3 h-3 mr-1" />
-                        {report.wrong}
-                      </div>
-                      <div className="flex items-center text-slate-500" title="Skipped">
-                        <AlertCircle className="w-3 h-3 mr-1" />
-                        {report.skipped}
-                      </div>
-                    </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        report.status === 'Passed' 
+                          ? 'bg-emerald-50 text-emerald-600' 
+                          : 'bg-red-50 text-red-600'
+                      }`}>
+                        {report.status === 'Passed' ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                        {report.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-500 text-sm">{report.date}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
+                    No test results found.
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      report.status === 'Passed' 
-                        ? 'bg-emerald-50 text-emerald-600' 
-                        : 'bg-red-50 text-red-600'
-                    }`}>
-                      {report.status === 'Passed' ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
-                      {report.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-500 text-sm">{report.date}</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
         
         {/* Pagination Placeholder */}
         <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
-          <span>Showing 1 to 5 of 5 results</span>
+          <span>Showing {filteredReports.length} results</span>
           <div className="flex gap-2">
             <button className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Previous</button>
             <button className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Next</button>

@@ -5,7 +5,8 @@ import {
   FileText, 
   Mail, 
   CheckCircle,
-  X
+  X,
+  Trash2
 } from 'lucide-react';
 
 const CandidateRegistration = () => {
@@ -156,6 +157,14 @@ const CandidateRegistration = () => {
     }
   };
 
+  const handleDelete = (emailToDelete) => {
+    if (window.confirm(`Are you sure you want to delete ${emailToDelete}?`)) {
+      const updatedCandidates = recentCandidates.filter(c => c.email !== emailToDelete);
+      setRecentCandidates(updatedCandidates);
+      localStorage.setItem('candidates_list', JSON.stringify(updatedCandidates));
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="mb-8">
@@ -275,6 +284,7 @@ const CandidateRegistration = () => {
                 <th className="px-6 py-4">Date Added</th>
                 <th className="px-6 py-4">Method</th>
                 <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -296,12 +306,21 @@ const CandidateRegistration = () => {
                         Active
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleDelete(candidate.email)}
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Candidate"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
               {recentCandidates.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-slate-400">
+                  <td colSpan="6" className="p-8 text-center text-slate-400">
                     No candidates registered yet.
                   </td>
                 </tr>

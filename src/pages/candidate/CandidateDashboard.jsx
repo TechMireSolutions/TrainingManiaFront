@@ -421,7 +421,7 @@ const CandidateDashboard = () => {
                   </div>
 
                   <button
-                    onClick={() => navigate(`/candidate/take-test/${currentCourse.trainingId}`)}
+                    onClick={() => navigate('/candidate/quiz', { state: { course: currentCourse } })}
                     disabled={!isPdfDownloaded}
                     className={`flex items-center px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${isPdfDownloaded
                       ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'

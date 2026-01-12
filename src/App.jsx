@@ -9,6 +9,7 @@ import NewTraining from './pages/admin/NewTraining'; // Added import
 
 import CandidateLogin from './pages/candidate/CandidateLogin';
 import CandidateDashboard from './pages/candidate/CandidateDashboard';
+import Quiz from './pages/candidate/Quiz';
 import TakeQuiz from './pages/candidate/TakeQuiz';
 import Certificate from './pages/candidate/Certificate'; // Added import
 
@@ -26,6 +27,7 @@ function App() {
         {/* Candidate Routes */}
         <Route path="/candidate/login" element={<CandidateLogin />} />
         <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
+        <Route path="/candidate/quiz" element={<Quiz />} />
         <Route path="/candidate/take-test/:id" element={<TakeQuiz />} />
         <Route path="/candidate/certificate/:id" element={<Certificate />} /> {/* Added route */}
       </Routes>

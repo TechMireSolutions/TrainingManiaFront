@@ -144,6 +144,13 @@ const Enrollment = () => {
     setParsedData({ existing: [], newCandidates: [] });
   };
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredEnrollments = enrollments.filter(enrollment => 
+    enrollment.candidate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    enrollment.training.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="w-full">
       <div className="mb-8">
@@ -305,6 +312,8 @@ const Enrollment = () => {
               <input
                 type="text"
                 placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/50 w-full sm:w-48 text-slate-900 placeholder:text-slate-400"
               />
             </div>
@@ -321,8 +330,8 @@ const Enrollment = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {enrollments.length > 0 ? (
-                  enrollments.map((enrollment) => (
+                {filteredEnrollments.length > 0 ? (
+                  filteredEnrollments.map((enrollment) => (
                     <tr key={enrollment.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-slate-900">{enrollment.candidate}</td>
                       <td className="px-6 py-4 text-slate-500">
@@ -343,7 +352,7 @@ const Enrollment = () => {
                 ) : (
                   <tr>
                     <td colSpan="4" className="px-6 py-12 text-center text-slate-400">
-                      No enrollments yet. Use the form to enroll candidates.
+                      No enrollments found.
                     </td>
                   </tr>
                 )}
