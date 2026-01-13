@@ -70,7 +70,7 @@ const GeneratedTest = () => {
       videoType: videoType || 'youtube',
       videoUrl: videoUrl,
       pdfFile: location.state.pdfFile, // Save PDF filename
-      thumbnail: (videoType === 'youtube' && videoUrl) ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
+      thumbnail: location.state.thumbnail || ((videoType === 'youtube' && videoUrl) ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null),
       duration: videoUrl ? "20 mins" : "12 pages",
       candidates: 0,
       status: "Active",

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BarChart2, 
   Search, 
@@ -10,69 +10,71 @@ import {
 } from 'lucide-react';
 
 const Reports = () => {
-  // Mock Data for Reports
-  const [reports] = useState([
-    {
-      id: 1,
-      candidate: "alex.johnson@example.com",
-      training: "WordPress Fundamentals",
-      score: 85,
-      totalMarks: 100,
-      correct: 17,
-      wrong: 3,
-      skipped: 0,
-      status: "Passed",
-      date: "Jan 10, 2026"
-    },
-    {
-      id: 2,
-      candidate: "sarah.williams@example.com",
-      training: "Cyber Security Basics",
-      score: 45,
-      totalMarks: 100,
-      correct: 9,
-      wrong: 11,
-      skipped: 0,
-      status: "Failed",
-      date: "Jan 09, 2026"
-    },
-    {
-      id: 3,
-      candidate: "michael.brown@company.net",
-      training: "Advanced React Patterns",
-      score: 92,
-      totalMarks: 100,
-      correct: 18,
-      wrong: 1,
-      skipped: 1,
-      status: "Passed",
-      date: "Jan 08, 2026"
-    },
-    {
-      id: 4,
-      candidate: "emily.davis@provider.org",
-      training: "WordPress Fundamentals",
-      score: 70,
-      totalMarks: 100,
-      correct: 14,
-      wrong: 6,
-      skipped: 0,
-      status: "Passed",
-      date: "Jan 08, 2026"
-    },
-    {
-      id: 5,
-      candidate: "david.wilson@studio.io",
-      training: "Cyber Security Basics",
-      score: 30,
-      totalMarks: 100,
-      correct: 6,
-      wrong: 14,
-      skipped: 0,
-      status: "Failed",
-      date: "Jan 07, 2026"
+  const [reports, setReports] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+    // Filter for completed or failed tests
+    const completedTests = enrollments.filter(e => e.status === 'Completed' || e.status === 'Failed');
+    
+    const formattedReports = completedTests.map((test, index) => {
+      // Try to get detailed stats if available, otherwise estimate or default
+      // Assuming 20 questions for estimation if exact counts aren't saved
+      const totalQuestions = 20; 
+      const estimatedCorrect = Math.round((test.score || 0) / 100 * totalQuestions);
+      
+      return {
+        id: index + 1,
+        candidate: test.candidate,
+        training: test.training,
+        score: test.score || 0,
+        totalMarks: 100,
+        correct: test.correctAnswers !== undefined ? test.correctAnswers : estimatedCorrect,
+        wrong: test.wrongAnswers !== undefined ? test.wrongAnswers : (totalQuestions - estimatedCorrect),
+        skipped: test.skippedAnswers !== undefined ? test.skippedAnswers : 0,
+        status: test.status,
+        date: test.lastAttemptDate || test.date || new Date().toLocaleDateString()
+      };
+    });
+    
+    setReports(formattedReports);
+  }, []);
+
+  const filteredReports = reports.filter(report => 
+    report.candidate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    report.training.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExportCSV = () => {
+    const headers = ['Candidate', 'Training Module', 'Score', 'Total Marks', 'Correct', 'Wrong', 'Skipped', 'Status', 'Date'];
+    const csvContent = [
+      headers.join(','),
+      ...filteredReports.map(row => [
+        row.candidate,
+        `"${row.training}"`, // Quote training name to handle commas
+        row.score,
+        row.totalMarks,
+        row.correct,
+        row.wrong,
+        row.skipped,
+        row.status,
+        row.date
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'performance_reports.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-  ]);
+  };
 
   return (
     <div className="w-full">
@@ -86,7 +88,10 @@ const Reports = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </button>
-          <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-lg shadow-indigo-200">
+          <button 
+            onClick={handleExportCSV}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-lg shadow-indigo-200"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </button>
@@ -100,6 +105,8 @@ const Reports = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search candidate or training..." 
               className="pl-9 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/50 w-full sm:w-64 text-slate-900 placeholder:text-slate-400"
             />
@@ -119,7 +126,7 @@ const Reports = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {reports.map((report) => (
+              {filteredReports.map((report) => (
                 <tr key={report.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 font-medium text-slate-900">{report.candidate}</td>
                   <td className="px-6 py-4 text-slate-500">{report.training}</td>
@@ -163,7 +170,7 @@ const Reports = () => {
         
         {/* Pagination Placeholder */}
         <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
-          <span>Showing 1 to 5 of 5 results</span>
+          <span>Showing {filteredReports.length > 0 ? 1 : 0} to {filteredReports.length} of {reports.length} results</span>
           <div className="flex gap-2">
             <button className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Previous</button>
             <button className="px-3 py-1 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-50" disabled>Next</button>

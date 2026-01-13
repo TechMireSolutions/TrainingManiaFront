@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, LayoutDashboard, BookOpen, PlayCircle, CheckCircle, Clock, FileText, HelpCircle, ArrowRight, MessageSquare, Award } from 'lucide-react';
 
+import { mcqPool, fibPool } from '../../data/questionBank';
+
 const CandidateDashboard = () => {
   const navigate = useNavigate();
   const [candidate, setCandidate] = useState(null);
@@ -20,18 +22,115 @@ const CandidateDashboard = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isPdfDownloaded, setIsPdfDownloaded] = useState(false);
 
+  // Levenshtein distance for fuzzy matching
+  const levenshteinDistance = (a, b) => {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+
+    const matrix = [];
+
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+          );
+        }
+      }
+    }
+
+    return matrix[b.length][a.length];
+  };
+
+  const findAnswer = (query) => {
+    const stopWords = ['what', 'is', 'the', 'a', 'an', 'in', 'of', 'to', 'for', 'and', 'or', 'are', 'how', 'do', 'does', 'did', 'can', 'could', 'would', 'should', 'who', 'which'];
+    const queryKeywords = query.toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter(word => word.length > 2 && !stopWords.includes(word));
+
+    if (queryKeywords.length === 0) {
+      return "Please provide more details in your question so I can help you better.";
+    }
+
+    let bestMatch = null;
+    let maxScore = 0;
+
+    const allQuestions = [...mcqPool, ...fibPool];
+
+    allQuestions.forEach(item => {
+      const questionText = item.question.toLowerCase();
+      const questionKeywords = questionText
+        .replace(/[^\w\s]/g, '')
+        .split(/\s+/)
+        .filter(word => word.length > 2 && !stopWords.includes(word));
+      
+      let score = 0;
+      
+      queryKeywords.forEach(qWord => {
+        let bestWordMatch = 0;
+        
+        // Check against all question keywords
+        for (const kWord of questionKeywords) {
+          if (kWord === qWord) {
+            bestWordMatch = 1;
+            break; // Exact match found
+          }
+          
+          const dist = levenshteinDistance(qWord, kWord);
+          const allowedDist = qWord.length > 4 ? 2 : 1;
+          
+          if (dist <= allowedDist) {
+            bestWordMatch = Math.max(bestWordMatch, 0.8); // Fuzzy match
+          }
+        }
+        score += bestWordMatch;
+      });
+
+      // Bonus for exact phrase match
+      if (questionText.includes(query.toLowerCase())) {
+        score += 5;
+      }
+
+      if (score > maxScore) {
+        maxScore = score;
+        bestMatch = item;
+      }
+    });
+
+    // Threshold: At least some match score (e.g. 0.8 means at least one fuzzy match)
+    if (bestMatch && maxScore >= 0.8) {
+      return bestMatch.correctAnswer || bestMatch.answer;
+    }
+
+    return "I'm sorry, I couldn't find a specific answer to that in the training material. Could you please rephrase or ask something else?";
+  };
+
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
 
     const newMsg = { role: 'user', text: inputMessage };
     setMessages(prev => [...prev, newMsg]);
+    const userQuery = inputMessage; // Capture current input for the closure
     setInputMessage('');
 
     // Simulate AI Response
     setTimeout(() => {
+      const answer = findAnswer(userQuery);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: "That's a great question! Based on the video content, try to focus on the key principles mentioned around the middle section. Let me know if you need more specific details."
+        text: answer
       }]);
     }, 1000);
   };

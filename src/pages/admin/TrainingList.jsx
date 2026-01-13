@@ -53,14 +53,24 @@ const TrainingList = ({ onCreateNew }) => {
   useEffect(() => {
     // Check if we already have data
     const savedData = localStorage.getItem('training_modules');
+    const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
 
+    let loadedTrainings = [];
     if (savedData) {
-      setTrainings(JSON.parse(savedData));
+      loadedTrainings = JSON.parse(savedData);
     } else {
       // Seed with initial data
       localStorage.setItem('training_modules', JSON.stringify(initialTrainings));
-      setTrainings(initialTrainings);
+      loadedTrainings = initialTrainings;
     }
+
+    // Calculate dynamic candidate counts
+    const updatedTrainings = loadedTrainings.map(training => {
+      const count = enrollments.filter(e => e.training === training.title).length;
+      return { ...training, candidates: count };
+    });
+
+    setTrainings(updatedTrainings);
   }, []);
 
   const handleDelete = (id) => {
@@ -96,18 +106,19 @@ const TrainingList = ({ onCreateNew }) => {
             <div key={training.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all group">
               {/* Thumbnail Area */}
               <div className="h-48 bg-slate-50 relative overflow-hidden">
-                {training.type === 'youtube' ? (
-                  training.thumbnail && !training.thumbnail.includes('null') ? (
-                    <img src={training.thumbnail} alt={training.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  ) : (
+
+                {training.thumbnail && !training.thumbnail.includes('null') ? (
+                  <img src={training.thumbnail} alt={training.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  training.type === 'youtube' ? (
                     <div className="w-full h-full flex items-center justify-center bg-indigo-50">
                       <Youtube className="w-16 h-16 text-indigo-300" />
                     </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-orange-50">
+                      <FileText className="w-16 h-16 text-orange-300" />
+                    </div>
                   )
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-orange-50">
-                    <FileText className="w-16 h-16 text-orange-300" />
-                  </div>
                 )}
 
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-900 shadow-sm">

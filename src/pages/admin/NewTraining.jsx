@@ -7,7 +7,8 @@ import {
   AlertCircle,
   Save,
   Plus,
-  X
+  X,
+  Image
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,6 +16,8 @@ const NewTraining = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   // Video State
   const [videoType, setVideoType] = useState('youtube'); // 'youtube' or 'upload'
@@ -69,6 +72,64 @@ const NewTraining = () => {
           </h3>
 
           <div className="space-y-8">
+            {/* Thumbnail Upload (Optional) */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Course Thumbnail (Optional)
+              </label>
+              {!thumbnailFile ? (
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert('Image size exceeds 5MB');
+                          e.target.value = null;
+                          return;
+                        }
+                        setThumbnailFile(file);
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setThumbnail(reader.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors">
+                    <Image className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                    <p className="text-slate-900 font-medium">Click to upload thumbnail</p>
+                    <p className="text-sm text-slate-500">JPG, PNG up to 5MB</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
+                  <div className="flex items-center overflow-hidden">
+                    <div className="w-16 h-10 bg-slate-200 rounded-lg overflow-hidden mr-4 flex-shrink-0">
+                      <img src={thumbnail} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 truncate">{thumbnailFile.name}</p>
+                      <p className="text-xs text-slate-500">{(thumbnailFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setThumbnailFile(null);
+                      setThumbnail(null);
+                    }}
+                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* PDF Upload (Required) */}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -401,6 +462,7 @@ const NewTraining = () => {
                   videoType,
                   videoUrl: videoType === 'youtube' ? videoUrl : (videoFile ? videoFile.name : ''),
                   pdfFile: selectedFile.name, // Required
+                  thumbnail: thumbnail, // Pass the base64 thumbnail
                   settings: {
                     totalMarks: parseInt(totalMarks) || 100,
                     passingMarks: parseInt(passingMarks) || 40,
