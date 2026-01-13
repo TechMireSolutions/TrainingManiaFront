@@ -56,8 +56,8 @@ const CandidateDashboard = () => {
         // Find full training details to get videoUrl
         const trainingDetails = allTrainings.find(t => t.title === enrollment.training);
         return {
-          ...enrollment,
-          videoUrl: trainingDetails?.videoUrl || '',
+          ...trainingDetails, // Spread all training details (questions, settings, etc.)
+          ...enrollment,      // Spread enrollment details (overrides status, date if needed)
           videoUrl: trainingDetails?.videoUrl || '',
           thumbnail: trainingDetails?.thumbnail || '',
           pdfFile: trainingDetails?.pdfFile || '',
@@ -329,7 +329,7 @@ const CandidateDashboard = () => {
                     <td className="px-6 py-4 font-bold text-slate-900">{course.score ? parseFloat(course.score).toFixed(1) : '0'}</td>
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => navigate(`/candidate/take-test/${course.trainingId}`, { state: { mode: 'review', answers: course.userAnswers } })}
+                        onClick={() => navigate('/candidate/quiz', { state: { mode: 'review', answers: course.userAnswers, course: course } })}
                         disabled={!course.userAnswers}
                         className={`text-sm font-bold transition-colors ${course.userAnswers ? 'text-indigo-600 hover:text-indigo-800' : 'text-slate-300 cursor-not-allowed'}`}
                         title={!course.userAnswers ? "Review not available for older tests" : "Review your answers"}

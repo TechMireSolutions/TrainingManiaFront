@@ -96,17 +96,15 @@ const TrainingList = ({ onCreateNew }) => {
             <div key={training.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-all group">
               {/* Thumbnail Area */}
               <div className="h-48 bg-slate-50 relative overflow-hidden">
-                {training.type === 'youtube' ? (
-                  training.thumbnail && !training.thumbnail.includes('null') ? (
-                    <img src={training.thumbnail} alt={training.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-indigo-50">
-                      <Youtube className="w-16 h-16 text-indigo-300" />
-                    </div>
-                  )
+                {training.thumbnail ? (
+                  <img src={training.thumbnail} alt={training.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-orange-50">
-                    <FileText className="w-16 h-16 text-orange-300" />
+                  <div className={`w-full h-full flex items-center justify-center ${training.type === 'youtube' ? 'bg-indigo-50' : 'bg-orange-50'}`}>
+                    {training.type === 'youtube' ? (
+                      <Youtube className="w-16 h-16 text-indigo-300" />
+                    ) : (
+                      <FileText className="w-16 h-16 text-orange-300" />
+                    )}
                   </div>
                 )}
 

@@ -32,10 +32,10 @@ const GeneratedTest = () => {
 
     // Random Selection Logic
     const shuffledMcqs = [...mcqPool].sort(() => 0.5 - Math.random());
-    const selectedMcqs = shuffledMcqs.slice(0, mcqCount).map(q => ({ ...q, type: 'mcq' }));
+    const selectedMcqs = shuffledMcqs.slice(0, mcqCount).map((q, i) => ({ ...q, type: 'mcq', id: `mcq-${Date.now()}-${i}` }));
 
     const shuffledFibs = [...fibPool].sort(() => 0.5 - Math.random());
-    const selectedFibs = shuffledFibs.slice(0, fibCount).map(q => ({ ...q, type: 'fib' }));
+    const selectedFibs = shuffledFibs.slice(0, fibCount).map((q, i) => ({ ...q, type: 'fib', id: `fib-${Date.now()}-${i}` }));
 
     // Combine
     let combined = [...selectedMcqs, ...selectedFibs];
@@ -61,32 +61,45 @@ const GeneratedTest = () => {
     };
 
     const videoId = (videoType === 'youtube') ? getYoutubeId(videoUrl) : null;
+    const defaultThumbnail = (videoType === 'youtube' && videoUrl) ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
 
-    // Create new training object
-    const newTraining = {
-      id: Date.now(),
-      title: title,
-      type: contentType || (videoUrl ? 'video' : 'pdf'),
-      videoType: videoType || 'youtube',
-      videoUrl: videoUrl,
-      pdfFile: location.state.pdfFile, // Save PDF filename
-      thumbnail: (videoType === 'youtube' && videoUrl) ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
-      duration: videoUrl ? "20 mins" : "12 pages",
-      candidates: 0,
-      status: "Active",
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      questions: questions,
-      ...settings // Spread the settings (totalMarks, passingMarks, attempts, negativeMarking)
+    // Function to save training
+    const saveTraining = (thumbnailData) => {
+      const newTraining = {
+        id: Date.now(),
+        title: title,
+        type: contentType || (videoUrl ? 'video' : 'pdf'),
+        videoType: videoType || 'youtube',
+        videoUrl: videoUrl,
+        pdfFile: location.state.pdfFile,
+        thumbnail: thumbnailData || defaultThumbnail,
+        duration: videoUrl ? "20 mins" : "12 pages",
+        candidates: 0,
+        status: "Active",
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        questions: questions,
+        ...settings
+      };
+
+      const existingTrainings = JSON.parse(localStorage.getItem('training_modules') || '[]');
+      localStorage.setItem('training_modules', JSON.stringify([newTraining, ...existingTrainings]));
+
+      setIsSaved(true);
+      setTimeout(() => {
+        navigate('/admin/dashboard');
+      }, 1500);
     };
 
-    // Save to localStorage
-    const existingTrainings = JSON.parse(localStorage.getItem('training_modules') || '[]');
-    localStorage.setItem('training_modules', JSON.stringify([newTraining, ...existingTrainings]));
-
-    setIsSaved(true);
-    setTimeout(() => {
-      navigate('/admin/dashboard');
-    }, 1500);
+    // Handle Thumbnail File
+    if (location.state.thumbnailFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        saveTraining(reader.result); // Save as Base64
+      };
+      reader.readAsDataURL(location.state.thumbnailFile);
+    } else {
+      saveTraining(null);
+    }
   };
 
   return (

@@ -15,6 +15,7 @@ const NewTraining = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
 
   // Video State
   const [videoType, setVideoType] = useState('youtube'); // 'youtube' or 'upload'
@@ -207,6 +208,62 @@ const NewTraining = () => {
                       </button>
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail Upload (Optional) */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Course Thumbnail (Optional)
+              </label>
+              {!thumbnailFile ? (
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                          alert('Image size exceeds 2MB');
+                          e.target.value = null;
+                          return;
+                        }
+                        setThumbnailFile(file);
+                      }
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition-colors">
+                    <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-3 text-slate-400">
+                      <FileText className="w-6 h-6" />
+                    </div>
+                    <p className="text-slate-900 font-medium">Click to upload thumbnail</p>
+                    <p className="text-sm text-slate-500">JPG, PNG up to 2MB</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between">
+                  <div className="flex items-center overflow-hidden">
+                    <div className="w-16 h-10 bg-slate-200 rounded-lg overflow-hidden mr-4 flex-shrink-0">
+                      <img 
+                        src={URL.createObjectURL(thumbnailFile)} 
+                        alt="Thumbnail preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 truncate">{thumbnailFile.name}</p>
+                      <p className="text-xs text-slate-500">{(thumbnailFile.size / 1024).toFixed(2)} KB • Uploaded</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setThumbnailFile(null)}
+                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
               )}
             </div>
@@ -409,7 +466,8 @@ const NewTraining = () => {
                     negativeMarking: negativeMarking,
                     negativeMarkingValue: negativeMarking ? negativeMarkingValue : 0,
                     totalQuestions: totalQuestions
-                  }
+                  },
+                  thumbnailFile: thumbnailFile // Pass the file object
                 }
               });
             }}
